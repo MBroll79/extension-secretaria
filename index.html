@@ -3,910 +3,323 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Extensión Universitaria — Portal de Gestión</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Portal de Extensión Universitaria</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  :root {
-    --bg: #f5f2ec;
-    --surface: #fffdf8;
-    --surface2: #f0ece2;
-    --border: #ddd8cc;
-    --text: #1a1714;
-    --text-muted: #6b6560;
-    --accent: #2d5a3d;
-    --accent-light: #4a8c62;
-    --accent-bg: #e8f2ec;
-    --gold: #b8963e;
-    --gold-bg: #faf3e0;
-    --red: #8b3a3a;
-    --red-bg: #fdf0f0;
-    --blue: #2a4a7f;
-    --blue-bg: #edf2fb;
-    --purple: #5a3a7f;
-    --purple-bg: #f3eefb;
-    --radius: 12px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.07);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 15px;
-  }
-
-  /* ===== AUTH SCREEN ===== */
-  #auth-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1a2f22 0%, #2d5a3d 50%, #1a2a38 100%);
-    position: relative;
-    overflow: hidden;
-  }
-
-  #auth-screen::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle at 20% 80%, rgba(184,150,62,0.15) 0%, transparent 50%),
-                      radial-gradient(circle at 80% 20%, rgba(45,90,61,0.3) 0%, transparent 50%);
-  }
-
-  .auth-card {
-    background: var(--surface);
-    border-radius: 20px;
-    padding: 48px 44px;
-    width: 420px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.4);
-    position: relative;
-    z-index: 1;
-  }
-
-  .auth-logo {
-    text-align: center;
-    margin-bottom: 36px;
-  }
-
-  .auth-logo .logo-icon {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
-    border-radius: 16px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    margin-bottom: 16px;
-  }
-
-  .auth-logo h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 24px;
-    color: var(--text);
-    line-height: 1.2;
-  }
-
-  .auth-logo p {
-    color: var(--text-muted);
-    font-size: 13px;
-    margin-top: 6px;
-  }
-
-  .form-group {
-    margin-bottom: 18px;
-  }
-
-  .form-group label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .form-group input, .form-group select, .form-group textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    background: var(--bg);
-    color: var(--text);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-  }
-
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(45,90,61,0.12);
-    background: white;
-  }
-
-  .btn-primary {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-light));
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-    margin-top: 8px;
-  }
-
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,90,61,0.35); }
-  .btn-primary:active { transform: translateY(0); }
-
-  .auth-roles {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
-
-  .auth-roles p {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-align: center;
-    margin-bottom: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .role-pills {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .role-pill {
-    padding: 6px 14px;
-    border-radius: 99px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1.5px solid var(--border);
-    background: var(--bg);
-    color: var(--text-muted);
-    transition: all 0.15s;
-  }
-
-  .role-pill:hover, .role-pill.active {
-    border-color: var(--accent);
-    background: var(--accent-bg);
-    color: var(--accent);
-  }
-
-  .error-msg {
-    background: var(--red-bg);
-    color: var(--red);
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    margin-top: 12px;
-    display: none;
-  }
-
-  /* ===== APP LAYOUT ===== */
-  #app {
-    display: none;
-    flex-direction: column;
-    height: 100vh;
-  }
-
-  /* TOPBAR */
-  .topbar {
-    background: var(--accent);
-    color: white;
-    padding: 0 28px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-  }
-
-  .topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .topbar-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px;
-    color: white;
-    letter-spacing: -0.02em;
-  }
-
-  .topbar-badge {
-    background: rgba(255,255,255,0.2);
-    padding: 3px 10px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .user-chip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255,255,255,0.15);
-    padding: 6px 14px 6px 8px;
-    border-radius: 99px;
-    cursor: pointer;
-  }
-
-  .user-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  .user-chip-info { line-height: 1.2; }
-  .user-chip-name { font-size: 13px; font-weight: 600; color: white; }
-  .user-chip-role { font-size: 11px; color: rgba(255,255,255,0.7); }
-
-  .btn-logout {
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: white;
-    padding: 7px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    transition: background 0.15s;
-  }
-  .btn-logout:hover { background: rgba(255,255,255,0.25); }
-
-  /* MAIN LAYOUT */
-  .main-layout {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  /* SIDEBAR */
-  .sidebar {
-    width: 240px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    padding: 24px 16px;
-    overflow-y: auto;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .sidebar-section-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    padding: 12px 12px 6px;
-  }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-muted);
-    transition: all 0.15s;
-    text-decoration: none;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-  }
-
-  .nav-item .nav-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-
-  .nav-item:hover { background: var(--bg); color: var(--text); }
-
-  .nav-item.active {
-    background: var(--accent-bg);
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .nav-item.active .nav-icon { background: var(--accent); }
-
-  .nav-count {
-    margin-left: auto;
-    background: var(--accent);
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 99px;
-    min-width: 20px;
-    text-align: center;
-  }
-
-  /* CONTENT AREA */
-  .content-area {
-    flex: 1;
-    overflow-y: auto;
-    padding: 32px 36px;
-  }
-
-  /* PAGE HEADER */
-  .page-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 32px;
-  }
-
-  .page-title-area h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 30px;
-    color: var(--text);
-    line-height: 1.1;
-  }
-
-  .page-title-area p {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-top: 6px;
-  }
-
-  .btn-new {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 11px 20px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .btn-new:hover { background: var(--accent-light); transform: translateY(-1px); }
-
-  /* STATS ROW */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 20px;
-    border: 1px solid var(--border);
-  }
-
-  .stat-label {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-  }
-
-  .stat-value {
-    font-family: 'DM Serif Display', serif;
-    font-size: 36px;
-    line-height: 1;
-    color: var(--text);
-  }
-
-  .stat-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 4px;
-  }
-
-  /* FILTERS BAR */
-  .filters-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-
-  .search-input {
-    flex: 1;
-    min-width: 200px;
-    padding: 9px 16px 9px 38px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-    position: relative;
-  }
-  .search-input:focus { border-color: var(--accent); }
-
-  .search-wrap {
-    position: relative;
-    flex: 1;
-    min-width: 200px;
-  }
-  .search-wrap::before {
-    content: '🔍';
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 13px;
-    pointer-events: none;
-  }
-
-  .filter-select {
-    padding: 9px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  .filter-select:focus { border-color: var(--accent); }
-
-  /* TABLE */
-  .table-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .data-table th {
-    background: var(--surface2);
-    padding: 12px 16px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .data-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-    vertical-align: middle;
-  }
-
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table tbody tr:hover { background: var(--bg); }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 10px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  .badge-green { background: var(--accent-bg); color: var(--accent); }
-  .badge-gold { background: var(--gold-bg); color: var(--gold); }
-  .badge-red { background: var(--red-bg); color: var(--red); }
-  .badge-blue { background: var(--blue-bg); color: var(--blue); }
-  .badge-purple { background: var(--purple-bg); color: var(--purple); }
-  .badge-gray { background: var(--surface2); color: var(--text-muted); }
-
-  .action-btn {
-    padding: 5px 12px;
-    border-radius: 7px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    color: var(--text-muted);
-    transition: all 0.15s;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .action-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
-
-  /* MODAL */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(3px);
-  }
-  .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: var(--surface);
-    border-radius: 20px;
-    padding: 36px 40px;
-    width: 560px;
-    max-width: 95vw;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-    animation: modalIn 0.2s ease;
-  }
-
-  @keyframes modalIn {
-    from { transform: translateY(16px) scale(0.98); opacity: 0; }
-    to { transform: translateY(0) scale(1); opacity: 1; }
-  }
-
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 28px;
-  }
-
-  .modal-header h3 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-  }
-
-  .modal-close {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: none;
-    background: var(--surface2);
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s;
-  }
-  .modal-close:hover { background: var(--border); }
-
-  .modal-footer {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
-
-  .btn-secondary {
-    padding: 10px 20px;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--text-muted);
-    transition: all 0.15s;
-  }
-  .btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
-
-  .btn-save {
-    padding: 10px 24px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .btn-save:hover { background: var(--accent-light); }
-
-  /* DASHBOARD GRID */
-  .dash-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-top: 24px;
-  }
-
-  .dash-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 24px;
-  }
-
-  .dash-card h4 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 17px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .recent-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
-  .recent-item:last-child { border-bottom: none; }
-
-  .recent-item-title {
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-
-  .recent-item-sub { color: var(--text-muted); font-size: 12px; }
-
-  .area-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px;
-    background: var(--bg);
-    border-radius: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.15s;
-    border: 1.5px solid transparent;
-  }
-  .area-card:hover { border-color: var(--accent); background: var(--accent-bg); }
-
-  .area-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-  }
-
-  .area-card-info h5 { font-size: 14px; font-weight: 600; }
-  .area-card-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
-  /* NO DATA */
-  .no-data {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--text-muted);
-  }
-  .no-data .no-data-icon { font-size: 40px; margin-bottom: 12px; }
-  .no-data h4 { font-size: 16px; margin-bottom: 6px; color: var(--text); }
-
-  /* TOAST */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--text);
-    color: white;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: var(--shadow-lg);
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all 0.3s;
-    z-index: 999;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.success { background: var(--accent); }
-
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-  /* ADMIN PANEL */
-  .user-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px;
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    margin-bottom: 12px;
-  }
-
-  .big-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-  }
-
-  .user-info h5 { font-size: 15px; font-weight: 600; }
-  .user-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .user-card-actions { margin-left: auto; display: flex; gap: 8px; }
+:root {
+  --ink:        #0f1117;
+  --ink-soft:   #3a3d4a;
+  --ink-muted:  #7a7f8e;
+  --paper:      #fafaf8;
+  --paper2:     #f2f1ed;
+  --paper3:     #e8e6df;
+  --line:       #dedad1;
+  --forest:     #1e4d35;
+  --forest-mid: #2e7352;
+  --forest-lit: #43a872;
+  --forest-bg:  #ebf5f0;
+  --gold:       #c17f24;
+  --gold-bg:    #fdf5e8;
+  --ruby:       #a0293a;
+  --ruby-bg:    #fdf0f2;
+  --sapphire:   #1d3f7a;
+  --sapphire-bg:#edf1fb;
+  --violet:     #5b2d8e;
+  --violet-bg:  #f3edfb;
+  --teal:       #1a6b6b;
+  --teal-bg:    #e6f4f4;
+  --r:          10px;
+  --r-lg:       16px;
+  --shadow:     0 1px 8px rgba(0,0,0,.08), 0 4px 20px rgba(0,0,0,.05);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* ── AUTH ── */
+#auth{display:flex;align-items:center;justify-content:center;min-height:100vh;
+  background:var(--forest);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 10% 90%, rgba(67,168,114,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 90% 10%, rgba(193,127,36,.12) 0%, transparent 60%);
+}
+.auth-wrap{background:var(--paper);border-radius:20px;padding:52px 48px;width:440px;max-width:95vw;box-shadow:var(--shadow-lg)}
+.auth-brand{text-align:center;margin-bottom:40px}
+.auth-seal{width:68px;height:68px;background:var(--forest);border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:18px;box-shadow:0 4px 20px rgba(30,77,53,.35)}
+.auth-brand h1{font-family:'Playfair Display',serif;font-size:22px;line-height:1.2;color:var(--ink)}
+.auth-brand p{color:var(--ink-muted);font-size:13px;margin-top:5px}
+.fgroup{margin-bottom:16px}
+.fgroup label{display:block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:7px}
+.fgroup input,.fgroup select,.fgroup textarea{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:14px;background:var(--paper2);color:var(--ink);outline:none;transition:border .2s,box-shadow .2s}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{border-color:var(--forest-mid);box-shadow:0 0 0 3px rgba(46,115,82,.13);background:#fff}
+.fgroup textarea{resize:vertical;min-height:80px}
+.btn-primary{width:100%;padding:13px;background:var(--forest);color:#fff;border:none;border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:6px;letter-spacing:.02em}
+.btn-primary:hover{background:var(--forest-mid);box-shadow:0 4px 16px rgba(30,77,53,.3);transform:translateY(-1px)}
+.auth-demo{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);text-align:center}
+.auth-demo p{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted);margin-bottom:10px;font-weight:600}
+.demo-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.dpill{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--line);background:var(--paper2);color:var(--ink-muted);transition:all .15s}
+.dpill:hover,.dpill.on{border-color:var(--forest-mid);background:var(--forest-bg);color:var(--forest)}
+.auth-err{background:var(--ruby-bg);color:var(--ruby);padding:9px 14px;border-radius:8px;font-size:13px;margin-top:10px;display:none}
+
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;flex-direction:column}
+.topbar{background:var(--forest);height:58px;display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.tb-logo{font-family:'Playfair Display',serif;font-size:17px;color:#fff;white-space:nowrap}
+.tb-sep{width:1px;height:22px;background:rgba(255,255,255,.2)}
+.tb-badge{background:rgba(255,255,255,.18);color:#fff;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:99px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.tb-user{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.13);padding:5px 12px 5px 6px;border-radius:99px}
+.tb-av{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:'IBM Plex Mono',monospace}
+.tb-uname{font-size:13px;font-weight:500;color:#fff}
+.tb-urole{font-size:10px;color:rgba(255,255,255,.65)}
+.btn-logout{background:rgba(255,255,255,.13);border:none;color:rgba(255,255,255,.85);padding:6px 12px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;transition:background .15s}
+.btn-logout:hover{background:rgba(255,255,255,.22)}
+
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:228px;background:#fff;border-right:1px solid var(--line);padding:20px 12px;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;gap:2px}
+.sb-label{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);padding:12px 10px 5px}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:500;color:var(--ink-soft);transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:'IBM Plex Sans',sans-serif}
+.nav-btn .ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transition:background .15s}
+.nav-btn:hover{background:var(--paper2);color:var(--ink)}
+.nav-btn.active{background:var(--forest-bg);color:var(--forest);font-weight:600}
+.nav-btn.active .ico{background:var(--forest);font-size:15px}
+.nav-cnt{margin-left:auto;background:var(--forest);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;font-family:'IBM Plex Mono',monospace}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:28px 32px}
+
+/* ── PAGE HEADER ── */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px}
+.ph-left h2{font-family:'Playfair Display',serif;font-size:26px;line-height:1.1;color:var(--ink)}
+.ph-left p{color:var(--ink-muted);font-size:13px;margin-top:5px}
+.ph-right{display:flex;gap:8px;flex-shrink:0}
+.btn-new{display:flex;align-items:center;gap:7px;padding:9px 16px;background:var(--forest);color:#fff;border:none;border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-new:hover{background:var(--forest-mid);transform:translateY(-1px)}
+.btn-report{display:flex;align-items:center;gap:6px;padding:9px 14px;border:1.5px solid var(--line);background:#fff;border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:var(--ink-soft);transition:all .15s;white-space:nowrap}
+.btn-report:hover{border-color:var(--forest-mid);color:var(--forest);background:var(--forest-bg)}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.scard{background:#fff;border-radius:var(--r);padding:16px 18px;border:1px solid var(--line)}
+.scard-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:6px}
+.scard-val{font-family:'Playfair Display',serif;font-size:32px;line-height:1;color:var(--ink)}
+.scard-sub{font-size:11px;color:var(--ink-muted);margin-top:3px}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap::before{content:'⌕';position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--ink-muted);pointer-events:none;line-height:1}
+.search-inp{width:100%;padding:9px 14px 9px 34px;border:1.5px solid var(--line);border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:13px;background:#fff;color:var(--ink);outline:none;transition:border .2s}
+.search-inp:focus{border-color:var(--forest-mid)}
+.fsel{padding:9px 12px;border:1.5px solid var(--line);border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:13px;background:#fff;color:var(--ink);outline:none;cursor:pointer;transition:border .2s}
+.fsel:focus{border-color:var(--forest-mid)}
+
+/* ── TABLE ── */
+.tbl-wrap{background:#fff;border-radius:var(--r-lg);border:1px solid var(--line);overflow:auto}
+.dtbl{width:100%;border-collapse:collapse;min-width:700px}
+.dtbl th{background:var(--paper2);padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted);border-bottom:1px solid var(--line);white-space:nowrap}
+.dtbl td{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
+.dtbl tbody tr:last-child td{border-bottom:none}
+.dtbl tbody tr:hover{background:var(--paper)}
+.dtbl tbody tr.hidden-row{display:none}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.b-green{background:var(--forest-bg);color:var(--forest)}
+.b-gold{background:var(--gold-bg);color:var(--gold)}
+.b-red{background:var(--ruby-bg);color:var(--ruby)}
+.b-blue{background:var(--sapphire-bg);color:var(--sapphire)}
+.b-violet{background:var(--violet-bg);color:var(--violet)}
+.b-teal{background:var(--teal-bg);color:var(--teal)}
+.b-gray{background:var(--paper3);color:var(--ink-muted)}
+
+/* ── ROW ACTIONS ── */
+.row-actions{display:flex;gap:6px}
+.btn-sm{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid var(--line);background:#fff;color:var(--ink-muted);font-family:'IBM Plex Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn-sm:hover{border-color:var(--forest-mid);color:var(--forest);background:var(--forest-bg)}
+.btn-sm.del:hover{border-color:var(--ruby);color:var(--ruby);background:var(--ruby-bg)}
+
+/* ── FILE BADGE ── */
+.fbadge{display:inline-flex;align-items:center;gap:4px;background:var(--forest-bg);color:var(--forest);font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.fbadge:hover{background:var(--forest);color:#fff}
+.fbadge.empty{background:var(--paper3);color:var(--ink-muted)}
+.fbadge.empty:hover{background:var(--line);color:var(--ink)}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,17,23,.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px;padding:0;width:580px;max-width:96vw;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);animation:mIn .2s ease}
+.modal.wide{width:680px}
+@keyframes mIn{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal-head{padding:24px 28px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-head h3{font-family:'Playfair Display',serif;font-size:20px}
+.modal-x{width:32px;height:32px;border-radius:50%;border:none;background:var(--paper2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.modal-x:hover{background:var(--line)}
+.modal-body{padding:24px 28px;overflow-y:auto;flex:1}
+.modal-foot{padding:18px 28px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+.btn-cancel{padding:9px 18px;border:1.5px solid var(--line);background:#fff;border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-muted);transition:all .15s}
+.btn-cancel:hover{border-color:var(--ink-muted);color:var(--ink)}
+.btn-save{padding:9px 22px;background:var(--forest);color:#fff;border:none;border-radius:var(--r);font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-save:hover{background:var(--forest-mid)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* ── FILE PANEL ── */
+.drop-zone{border:2px dashed var(--line);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--paper2);position:relative;margin-bottom:16px}
+.drop-zone:hover,.drop-zone.over{border-color:var(--forest-mid);background:var(--forest-bg)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-ico{font-size:32px;margin-bottom:8px}
+.drop-txt{font-size:13px;color:var(--ink-muted)}
+.drop-txt strong{color:var(--forest)}
+.flist{display:flex;flex-direction:column;gap:8px}
+.fitem{display:flex;align-items:center;gap:11px;padding:10px 12px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r)}
+.fitem-ico{width:34px;height:34px;border-radius:8px;background:var(--paper2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.fitem-info{flex:1;min-width:0}
+.fitem-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fitem-meta{font-size:10px;color:var(--ink-muted);margin-top:2px;font-family:'IBM Plex Mono',monospace}
+.fitem-acts{display:flex;gap:5px;flex-shrink:0}
+.no-files{text-align:center;padding:24px;color:var(--ink-muted);font-size:13px}
+
+/* ── DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.dcard{background:#fff;border-radius:var(--r-lg);border:1px solid var(--line);padding:22px}
+.dcard h4{font-family:'Playfair Display',serif;font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.area-row{display:flex;align-items:center;gap:12px;padding:11px 12px;background:var(--paper);border-radius:var(--r);margin-bottom:8px;cursor:pointer;border:1.5px solid transparent;transition:all .15s}
+.area-row:hover{border-color:var(--forest-mid);background:var(--forest-bg)}
+.area-ico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.area-info h5{font-size:13px;font-weight:600}
+.area-info p{font-size:11px;color:var(--ink-muted);margin-top:1px}
+.rec-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}
+.rec-item:last-child{border-bottom:none}
+.rec-title{font-weight:600;font-size:13px}
+.rec-sub{color:var(--ink-muted);margin-top:1px;font-size:11px}
+
+/* ── USER PANEL ── */
+.ucard{display:flex;align-items:center;gap:12px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);margin-bottom:10px}
+.uav{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;font-family:'IBM Plex Mono',monospace}
+.uinfo h5{font-size:14px;font-weight:600}
+.uinfo p{font-size:11px;color:var(--ink-muted);margin-top:2px}
+.ucard-r{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+/* ── NO DATA ── */
+.nodata{text-align:center;padding:52px 20px}
+.nodata-ico{font-size:36px;margin-bottom:10px}
+.nodata h4{font-size:15px;color:var(--ink)}
+.nodata p{font-size:12px;color:var(--ink-muted);margin-top:4px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:11px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);transform:translateY(60px);opacity:0;transition:all .28s;z-index:999;max-width:340px}
+.toast.show{transform:none;opacity:1}
+.toast.ok{background:var(--forest)}
+.toast.err{background:var(--ruby)}
+
+/* ── REPORT DROPDOWN ── */
+.report-menu{position:relative;display:inline-block}
+.report-dd{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);min-width:160px;z-index:50;overflow:hidden;display:none}
+.report-menu.open .report-dd{display:block}
+.report-dd button{display:flex;align-items:center;gap:8px;width:100%;padding:10px 14px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--ink-soft);transition:background .15s;text-align:left}
+.report-dd button:hover{background:var(--paper2)}
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
-<div id="auth-screen">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div class="logo-icon">🎓</div>
+<!-- ===== AUTH ===== -->
+<div id="auth">
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="auth-seal">🎓</div>
       <h1>Extensión Universitaria</h1>
       <p>Portal de Gestión Institucional</p>
     </div>
-
-    <div class="form-group">
-      <label>Usuario</label>
-      <input type="text" id="login-user" placeholder="Tu nombre de usuario" value="admin">
-    </div>
-    <div class="form-group">
-      <label>Contraseña</label>
-      <input type="password" id="login-pass" placeholder="••••••••" value="1234">
-    </div>
-
-    <button class="btn-primary" onclick="doLogin()">Ingresar al Portal</button>
-
-    <div class="error-msg" id="auth-error">Usuario o contraseña incorrectos.</div>
-
-    <div class="auth-roles">
-      <p>Demo rápido — elegí un perfil</p>
-      <div class="role-pills">
-        <span class="role-pill" onclick="setDemo('admin','1234','admin')">Administrador</span>
-        <span class="role-pill" onclick="setDemo('coordinador','1234','coordinador')">Coordinador</span>
-        <span class="role-pill" onclick="setDemo('usuario','1234','usuario')">Usuario</span>
+    <div class="fgroup"><label>Usuario</label><input id="lu" type="text" placeholder="Tu usuario" value="admin" autocomplete="username"></div>
+    <div class="fgroup"><label>Contraseña</label><input id="lp" type="password" placeholder="••••••••" value="1234" autocomplete="current-password"></div>
+    <button class="btn-primary" onclick="doLogin()">Ingresar</button>
+    <div class="auth-err" id="aerr">Usuario o contraseña incorrectos.</div>
+    <div class="auth-demo">
+      <p>Demo rápido</p>
+      <div class="demo-pills">
+        <span class="dpill" onclick="setDemo('admin','admin')">Administrador</span>
+        <span class="dpill" onclick="setDemo('coordinador','coordinador')">Coordinador</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ===== APP ===== -->
 <div id="app">
-  <div class="topbar">
-    <div class="topbar-left">
-      <span class="topbar-logo">Extensión Universitaria</span>
-      <span class="topbar-badge" id="topbar-role-badge">Admin</span>
-    </div>
-    <div class="topbar-right">
-      <div class="user-chip">
-        <div class="user-avatar" id="topbar-avatar">A</div>
-        <div class="user-chip-info">
-          <div class="user-chip-name" id="topbar-name">Administrador</div>
-          <div class="user-chip-role" id="topbar-role">Administrador</div>
+  <header class="topbar">
+    <span class="tb-logo">Extensión Universitaria</span>
+    <div class="tb-sep"></div>
+    <span class="tb-badge" id="tb-badge">Admin</span>
+    <div class="tb-right">
+      <div class="tb-user">
+        <div class="tb-av" id="tb-av">M</div>
+        <div>
+          <div class="tb-uname" id="tb-uname">Mariana</div>
+          <div class="tb-urole" id="tb-urole">Administrador</div>
         </div>
       </div>
       <button class="btn-logout" onclick="doLogout()">Salir</button>
     </div>
-  </div>
+  </header>
 
-  <div class="main-layout">
+  <div class="layout">
     <nav class="sidebar">
-      <div class="sidebar-section-label">Principal</div>
-      <button class="nav-item active" onclick="showPage('dashboard')">
-        <div class="nav-icon" style="background:#e8f2ec">📊</div>
-        Dashboard
+      <div class="sb-label">Principal</div>
+      <button class="nav-btn active" onclick="go('dashboard')">
+        <div class="ico" style="background:var(--paper2)">📊</div>Dashboard
       </button>
 
-      <div class="sidebar-section-label">Áreas</div>
-      <button class="nav-item" onclick="showPage('becas')">
-        <div class="nav-icon" style="background:var(--gold-bg)">🎓</div>
-        Becas
-        <span class="nav-count" id="cnt-becas">0</span>
+      <div class="sb-label">Áreas</div>
+      <button class="nav-btn" onclick="go('becas')">
+        <div class="ico" style="background:var(--gold-bg)">🎓</div>Becas Estudiantiles
+        <span class="nav-cnt" id="c-becas">0</span>
       </button>
-      <button class="nav-item" onclick="showPage('proyectos')">
-        <div class="nav-icon" style="background:var(--accent-bg)">🧪</div>
-        Proyectos
-        <span class="nav-count" id="cnt-proyectos">0</span>
+      <button class="nav-btn" onclick="go('rrhh')">
+        <div class="ico" style="background:var(--sapphire-bg)">👥</div>Recursos Humanos
+        <span class="nav-cnt" id="c-rrhh">0</span>
       </button>
-      <button class="nav-item" onclick="showPage('pasantias')">
-        <div class="nav-icon" style="background:var(--blue-bg)">💼</div>
-        Pasantías
-        <span class="nav-count" id="cnt-pasantias">0</span>
+      <button class="nav-btn" onclick="go('propiedad')">
+        <div class="ico" style="background:var(--violet-bg)">💡</div>Prop. Intelectual
+        <span class="nav-cnt" id="c-propiedad">0</span>
       </button>
-      <button class="nav-item" onclick="showPage('convenios')">
-        <div class="nav-icon" style="background:var(--purple-bg)">🤝</div>
-        Convenios
-        <span class="nav-count" id="cnt-convenios">0</span>
+      <button class="nav-btn" onclick="go('proyectos')">
+        <div class="ico" style="background:var(--forest-bg)">🧪</div>Proyectos
+        <span class="nav-cnt" id="c-proyectos">0</span>
       </button>
-      <button class="nav-item" onclick="showPage('contratos')">
-        <div class="nav-icon" style="background:var(--red-bg)">📄</div>
-        Contratos
-        <span class="nav-count" id="cnt-contratos">0</span>
+      <button class="nav-btn" onclick="go('pasantias')">
+        <div class="ico" style="background:var(--teal-bg)">💼</div>Pasantías
+        <span class="nav-cnt" id="c-pasantias">0</span>
+      </button>
+      <button class="nav-btn" onclick="go('convenios')">
+        <div class="ico" style="background:var(--ruby-bg)">🤝</div>Convenios
+        <span class="nav-cnt" id="c-convenios">0</span>
       </button>
 
-      <div class="sidebar-section-label" id="admin-section" style="display:none">Administración</div>
-      <button class="nav-item" id="nav-users" style="display:none" onclick="showPage('usuarios')">
-        <div class="nav-icon" style="background:#f0f0f0">👥</div>
-        Usuarios
+      <div class="sb-label" id="sb-admin" style="display:none">Admin</div>
+      <button class="nav-btn" id="nb-users" style="display:none" onclick="go('usuarios')">
+        <div class="ico" style="background:var(--paper2)">🔑</div>Usuarios
       </button>
     </nav>
 
-    <main class="content-area" id="content-area"></main>
+    <main class="content" id="content"></main>
   </div>
 </div>
 
 <!-- MODAL -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <div class="modal-header">
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-head">
       <h3 id="modal-title">Nuevo registro</h3>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-x" onclick="closeModal()">✕</button>
     </div>
-    <div id="modal-body"></div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
-      <button class="btn-save" id="modal-save-btn">Guardar</button>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" id="modal-save">Guardar</button>
     </div>
   </div>
 </div>
@@ -914,613 +327,878 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// DATA
-// ============================================================
-const USERS_DB = [
-  { id:1, username:'admin',        password:'1234', nombre:'María González',    role:'admin',        avatar:'MG', color:'#2d5a3d' },
-  { id:2, username:'coordinador',  password:'1234', nombre:'Carlos Romero',     role:'coordinador',  avatar:'CR', color:'#2a4a7f' },
-  { id:3, username:'usuario',      password:'1234', nombre:'Laura Pérez',       role:'usuario',      avatar:'LP', color:'#b8963e' },
+// ══════════════════════════════════════════════
+// USERS DATABASE
+// ══════════════════════════════════════════════
+const USERS = [
+  {id:1, username:'admin',       pass:'1234', nombre:'Mariana',       role:'admin',       av:'M',  color:'#1e4d35'},
+  {id:2, username:'coordinador', pass:'1234', nombre:'Carlos Romero', role:'coordinador', av:'CR', color:'#1d3f7a'},
 ];
 
-let state = {
-  currentUser: null,
-  currentPage: 'dashboard',
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let S = {
+  user: null,
+  page: 'dashboard',
   data: {
     becas: [
-      { id:1, nombre:'Juan Méndez', tipo:'Académica', monto:'$50.000', estado:'Activa', fecha:'2025-03-01', responsable:'M. González' },
-      { id:2, nombre:'Ana Torres',  tipo:'Investigación', monto:'$80.000', estado:'En revisión', fecha:'2025-04-15', responsable:'C. Romero' },
+      {id:1, nombre:'Méndez, Juan',  dni:'38.211.400', carrera:'Ingeniería',   tipo:'Académica',    estado:'Activa',      inicio:'2025-03-01', monto:'$50.000', responsable:'Mariana', obs:''},
+      {id:2, nombre:'Torres, Ana',   dni:'41.005.210', carrera:'Biología',     tipo:'Investigación',estado:'En revisión', inicio:'2025-04-15', monto:'$80.000', responsable:'C. Romero', obs:''},
+    ],
+    rrhh_beca: [
+      {id:1, nombre:'Soto, María',  dni:'30.111.222', categoria:'JTP', dedicacion:'Simple', estado:'Activa', inicio:'2024-03-01', resolucion:'RES-2024-010', obs:''},
+    ],
+    rrhh_contrato: [
+      {id:1, nombre:'López, Pedro', dni:'28.333.444', cargo:'Asesor', monto:'$120.000', estado:'Vigente', inicio:'2025-01-01', fin:'2025-12-31', obs:''},
+    ],
+    rrhh_codigo: [
+      {id:1, nombre:'Ramírez, Luis', dni:'35.555.666', codigo:'COD-001', categoria:'Titular', dedicacion:'Exclusiva', estado:'Activo', inicio:'2019-04-01', obs:''},
+    ],
+    propiedad: [
+      {id:1, titulo:'Método de fermentación sostenible', tipo:'Patente',  autores:'Dr. Ramírez', estado:'En trámite', fecha:'2025-01-10', nroExp:'EXP-2025-001', obs:''},
+      {id:2, titulo:'Software de gestión hídrica',       tipo:'Software', autores:'Dra. Soto',   estado:'Registrado', fecha:'2024-06-20', nroExp:'REG-2024-055', obs:''},
     ],
     proyectos: [
-      { id:1, nombre:'Agricultura Sostenible', area:'Ciencias', director:'Dr. Ramírez', estado:'En curso', inicio:'2025-01-10', fin:'2025-12-31' },
-      { id:2, nombre:'Inclusión Digital', area:'Tecnología', director:'Dra. Soto', estado:'Formulación', inicio:'2025-05-01', fin:'2026-04-30' },
+      {id:1, nombre:'Agricultura Sostenible', area:'Ciencias', director:'Dr. Ramírez', estado:'En curso',    inicio:'2025-01-10', fin:'2025-12-31', financiamiento:'UNC', obs:''},
+      {id:2, nombre:'Inclusión Digital',      area:'Tecnología',director:'Dra. Soto',  estado:'Formulación', inicio:'2025-05-01', fin:'2026-04-30', financiamiento:'CONICET', obs:''},
     ],
     pasantias: [
-      { id:1, nombre:'Pedro Álvarez', empresa:'TechCorp S.A.', tutor:'Ing. López', estado:'Activa', inicio:'2025-02-01', fin:'2025-07-31' },
+      {id:1, nombre:'Álvarez, Pedro', dni:'42.100.300', empresa:'TechCorp S.A.',   tutor:'Ing. López', estado:'Activa',    inicio:'2025-02-01', fin:'2025-07-31', carrera:'Sistemas', obs:''},
     ],
     convenios: [
-      { id:1, institucion:'Universidad de Córdoba', tipo:'Académico', estado:'Vigente', firma:'2024-08-20', vencimiento:'2027-08-20', responsable:'Rector' },
-      { id:2, institucion:'Municipalidad de RC', tipo:'Servicio', estado:'Vigente', firma:'2025-01-10', vencimiento:'2026-01-10', responsable:'M. González' },
+      {id:1, institucion:'Universidad de Córdoba', tipo:'Académico',  estado:'Vigente',       firma:'2024-08-20', vencimiento:'2027-08-20', responsable:'Mariana', obs:''},
+      {id:2, institucion:'Municipalidad de RC',    tipo:'Servicio',   estado:'Vigente',       firma:'2025-01-10', vencimiento:'2026-01-10', responsable:'Mariana', obs:''},
     ],
-    contratos: [
-      { id:1, proveedor:'Editorial Sur', concepto:'Material didáctico', monto:'$120.000', estado:'Activo', inicio:'2025-01-01', fin:'2025-12-31' },
-    ],
-  }
+  },
+  files: {},   // key: "area_id" → [{name,size,type,dataUrl,by,at}]
 };
 
-// ============================================================
+// ══════════════════════════════════════════════
 // AUTH
-// ============================================================
-function setDemo(user, pass, role) {
-  document.getElementById('login-user').value = user;
-  document.getElementById('login-pass').value = pass;
-  document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('active'));
-  event.target.classList.add('active');
+// ══════════════════════════════════════════════
+function setDemo(u, r) {
+  document.getElementById('lu').value = u;
+  document.getElementById('lp').value = '1234';
+  document.querySelectorAll('.dpill').forEach(p=>p.classList.remove('on'));
+  event.target.classList.add('on');
 }
-
 function doLogin() {
-  const u = document.getElementById('login-user').value.trim();
-  const p = document.getElementById('login-pass').value;
-  const found = USERS_DB.find(x => x.username === u && x.password === p);
-  if (!found) {
-    document.getElementById('auth-error').style.display = 'block';
-    return;
+  const u = document.getElementById('lu').value.trim();
+  const p = document.getElementById('lp').value;
+  const found = USERS.find(x => x.username===u && x.pass===p);
+  if (!found) { document.getElementById('aerr').style.display='block'; return; }
+  document.getElementById('aerr').style.display='none';
+  S.user = found;
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('tb-av').textContent    = found.av;
+  document.getElementById('tb-uname').textContent = found.nombre;
+  document.getElementById('tb-urole').textContent = cap(found.role);
+  document.getElementById('tb-badge').textContent = cap(found.role);
+  if (found.role==='admin') {
+    document.getElementById('sb-admin').style.display='block';
+    document.getElementById('nb-users').style.display='flex';
   }
-  document.getElementById('auth-error').style.display = 'none';
-  state.currentUser = found;
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-
-  // topbar
-  document.getElementById('topbar-name').textContent = found.nombre;
-  document.getElementById('topbar-role').textContent = capitalize(found.role);
-  document.getElementById('topbar-badge').textContent = capitalize(found.role);
-  document.getElementById('topbar-avatar').textContent = found.avatar;
-
-  // admin nav
-  if (found.role === 'admin') {
-    document.getElementById('admin-section').style.display = 'block';
-    document.getElementById('nav-users').style.display = 'flex';
-  }
-
-  updateCounts();
-  showPage('dashboard');
+  refreshCounts(); go('dashboard');
 }
-
 function doLogout() {
-  state.currentUser = null;
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  S.user=null;
+  document.getElementById('auth').style.display='flex';
+  document.getElementById('app').style.display='none';
 }
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 
-function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-// ============================================================
+// ══════════════════════════════════════════════
 // NAVIGATION
-// ============================================================
-function showPage(page) {
-  state.currentPage = page;
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const navMap = { dashboard:'dashboard', becas:'becas', proyectos:'proyectos', pasantias:'pasantias', convenios:'convenios', contratos:'contratos', usuarios:'usuarios' };
-  const buttons = document.querySelectorAll('.nav-item');
-  buttons.forEach(b => { if (b.textContent.toLowerCase().includes(page.toLowerCase())) b.classList.add('active'); });
-  
-  const pages = { dashboard: renderDashboard, becas: renderBecas, proyectos: renderProyectos,
-    pasantias: renderPasantias, convenios: renderConvenios, contratos: renderContratos, usuarios: renderUsuarios };
-  if (pages[page]) document.getElementById('content-area').innerHTML = pages[page]();
-}
-
-function updateCounts() {
-  ['becas','proyectos','pasantias','convenios','contratos'].forEach(k => {
-    const el = document.getElementById('cnt-'+k);
-    if (el) el.textContent = state.data[k].length;
-  });
-}
-
-// ============================================================
-// DASHBOARD
-// ============================================================
-function renderDashboard() {
-  const areas = [
-    { key:'becas', icon:'🎓', color:'var(--gold)', bg:'var(--gold-bg)', label:'Becas', desc:'Gestión de becas estudiantiles' },
-    { key:'proyectos', icon:'🧪', color:'var(--accent)', bg:'var(--accent-bg)', label:'Proyectos', desc:'Proyectos de extensión' },
-    { key:'pasantias', icon:'💼', color:'var(--blue)', bg:'var(--blue-bg)', label:'Pasantías', desc:'Vinculación con empresas' },
-    { key:'convenios', icon:'🤝', color:'var(--purple)', bg:'var(--purple-bg)', label:'Convenios', desc:'Acuerdos interinstitucionales' },
-    { key:'contratos', icon:'📄', color:'var(--red)', bg:'var(--red-bg)', label:'Contratos', desc:'Contratos vigentes' },
-  ];
-
-  const total = Object.values(state.data).reduce((a,b) => a + b.length, 0);
-
-  return `
-  <div class="page-header">
-    <div class="page-title-area">
-      <h2>Bienvenido/a, ${state.currentUser.nombre.split(' ')[0]} 👋</h2>
-      <p>Panel de control — Secretaría de Extensión Universitaria</p>
-    </div>
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">Total registros</div>
-      <div class="stat-value">${total}</div>
-      <div class="stat-sub">en todas las áreas</div>
-    </div>
-    ${areas.map(a => `
-    <div class="stat-card" style="cursor:pointer" onclick="showPage('${a.key}')">
-      <div class="stat-label">${a.label}</div>
-      <div class="stat-value" style="color:${a.color}">${state.data[a.key].length}</div>
-      <div class="stat-sub">${a.desc}</div>
-    </div>`).join('')}
-  </div>
-
-  <div class="dash-grid">
-    <div class="dash-card">
-      <h4>🗂 Áreas del sistema</h4>
-      ${areas.map(a => `
-      <div class="area-card" onclick="showPage('${a.key}')">
-        <div class="area-icon" style="background:${a.bg}">${a.icon}</div>
-        <div class="area-card-info">
-          <h5>${a.label}</h5>
-          <p>${state.data[a.key].length} registro${state.data[a.key].length !== 1 ? 's' : ''} — ${a.desc}</p>
-        </div>
-        <span style="margin-left:auto;color:var(--text-muted);font-size:18px">›</span>
-      </div>`).join('')}
-    </div>
-
-    <div class="dash-card">
-      <h4>🕓 Actividad reciente</h4>
-      ${[...state.data.becas, ...state.data.proyectos, ...state.data.pasantias].slice(-5).reverse().map(item => `
-      <div class="recent-item">
-        <div>
-          <div class="recent-item-title">${item.nombre || item.institucion || item.proveedor}</div>
-          <div class="recent-item-sub">${item.tipo || item.area || item.empresa || item.concepto || '—'}</div>
-        </div>
-        <span class="badge badge-green">${item.estado}</span>
-      </div>`).join('')}
-    </div>
-  </div>`;
-}
-
-// ============================================================
-// BECAS
-// ============================================================
-function renderBecas() {
-  const canEdit = state.currentUser.role !== 'usuario';
-  return `
-  <div class="page-header">
-    <div class="page-title-area">
-      <h2>Becas 🎓</h2>
-      <p>Gestión de becas estudiantiles de extensión</p>
-    </div>
-    ${canEdit ? `<button class="btn-new" onclick="openModal('beca')">+ Nueva beca</button>` : ''}
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" style="color:var(--gold)">${state.data.becas.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Activas</div><div class="stat-value">${state.data.becas.filter(b=>b.estado==='Activa').length}</div></div>
-    <div class="stat-card"><div class="stat-label">En revisión</div><div class="stat-value">${state.data.becas.filter(b=>b.estado==='En revisión').length}</div></div>
-  </div>
-
-  <div class="filters-bar">
-    <div class="search-wrap"><input class="search-input" placeholder="Buscar becario..." oninput="filterTable(this,'tbl-becas',0)"></div>
-    <select class="filter-select" onchange="filterTable(this,'tbl-becas',3)">
-      <option value="">Todos los estados</option>
-      <option>Activa</option><option>En revisión</option><option>Finalizada</option>
-    </select>
-  </div>
-
-  <div class="table-card">
-    <table class="data-table" id="tbl-becas">
-      <thead><tr><th>Becario/a</th><th>Tipo</th><th>Monto mensual</th><th>Estado</th><th>Fecha inicio</th><th>Responsable</th>${canEdit?'<th>Acciones</th>':''}</tr></thead>
-      <tbody>
-        ${state.data.becas.map(b => `
-        <tr data-id="${b.id}">
-          <td><strong>${b.nombre}</strong></td>
-          <td>${b.tipo}</td>
-          <td>${b.monto}</td>
-          <td><span class="badge ${b.estado==='Activa'?'badge-green':b.estado==='En revisión'?'badge-gold':'badge-gray'}">${b.estado}</span></td>
-          <td>${b.fecha}</td>
-          <td>${b.responsable}</td>
-          ${canEdit?`<td><button class="action-btn" onclick="deleteRow('becas',${b.id})">Eliminar</button></td>`:''}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-    ${state.data.becas.length === 0 ? noData('becas') : ''}
-  </div>`;
-}
-
-// ============================================================
-// PROYECTOS
-// ============================================================
-function renderProyectos() {
-  const canEdit = state.currentUser.role !== 'usuario';
-  return `
-  <div class="page-header">
-    <div class="page-title-area">
-      <h2>Proyectos 🧪</h2>
-      <p>Proyectos de extensión e investigación</p>
-    </div>
-    ${canEdit ? `<button class="btn-new" onclick="openModal('proyecto')">+ Nuevo proyecto</button>` : ''}
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" style="color:var(--accent)">${state.data.proyectos.length}</div></div>
-    <div class="stat-card"><div class="stat-label">En curso</div><div class="stat-value">${state.data.proyectos.filter(p=>p.estado==='En curso').length}</div></div>
-    <div class="stat-card"><div class="stat-label">Formulación</div><div class="stat-value">${state.data.proyectos.filter(p=>p.estado==='Formulación').length}</div></div>
-  </div>
-
-  <div class="filters-bar">
-    <div class="search-wrap"><input class="search-input" placeholder="Buscar proyecto..." oninput="filterTable(this,'tbl-proy',0)"></div>
-    <select class="filter-select" onchange="filterTable(this,'tbl-proy',3)">
-      <option value="">Todos los estados</option>
-      <option>En curso</option><option>Formulación</option><option>Finalizado</option>
-    </select>
-  </div>
-
-  <div class="table-card">
-    <table class="data-table" id="tbl-proy">
-      <thead><tr><th>Proyecto</th><th>Área</th><th>Director/a</th><th>Estado</th><th>Inicio</th><th>Fin</th>${canEdit?'<th>Acciones</th>':''}</tr></thead>
-      <tbody>
-        ${state.data.proyectos.map(p => `
-        <tr data-id="${p.id}">
-          <td><strong>${p.nombre}</strong></td>
-          <td>${p.area}</td>
-          <td>${p.director}</td>
-          <td><span class="badge ${p.estado==='En curso'?'badge-green':p.estado==='Formulación'?'badge-gold':'badge-gray'}">${p.estado}</span></td>
-          <td>${p.inicio}</td>
-          <td>${p.fin}</td>
-          ${canEdit?`<td><button class="action-btn" onclick="deleteRow('proyectos',${p.id})">Eliminar</button></td>`:''}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-}
-
-// ============================================================
-// PASANTIAS
-// ============================================================
-function renderPasantias() {
-  const canEdit = state.currentUser.role !== 'usuario';
-  return `
-  <div class="page-header">
-    <div class="page-title-area">
-      <h2>Pasantías 💼</h2>
-      <p>Vinculación laboral y pasantías estudiantiles</p>
-    </div>
-    ${canEdit ? `<button class="btn-new" onclick="openModal('pasantia')">+ Nueva pasantía</button>` : ''}
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" style="color:var(--blue)">${state.data.pasantias.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Activas</div><div class="stat-value">${state.data.pasantias.filter(p=>p.estado==='Activa').length}</div></div>
-  </div>
-
-  <div class="filters-bar">
-    <div class="search-wrap"><input class="search-input" placeholder="Buscar pasante o empresa..." oninput="filterTable(this,'tbl-pas',0)"></div>
-  </div>
-
-  <div class="table-card">
-    <table class="data-table" id="tbl-pas">
-      <thead><tr><th>Pasante</th><th>Empresa</th><th>Tutor/a</th><th>Estado</th><th>Inicio</th><th>Fin</th>${canEdit?'<th>Acciones</th>':''}</tr></thead>
-      <tbody>
-        ${state.data.pasantias.map(p => `
-        <tr data-id="${p.id}">
-          <td><strong>${p.nombre}</strong></td>
-          <td>${p.empresa}</td>
-          <td>${p.tutor}</td>
-          <td><span class="badge badge-green">${p.estado}</span></td>
-          <td>${p.inicio}</td>
-          <td>${p.fin}</td>
-          ${canEdit?`<td><button class="action-btn" onclick="deleteRow('pasantias',${p.id})">Eliminar</button></td>`:''}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-}
-
-// ============================================================
-// CONVENIOS
-// ============================================================
-function renderConvenios() {
-  const canEdit = state.currentUser.role !== 'usuario';
-  return `
-  <div class="page-header">
-    <div class="page-title-area">
-      <h2>Convenios 🤝</h2>
-      <p>Acuerdos interinstitucionales y marcos de cooperación</p>
-    </div>
-    ${canEdit ? `<button class="btn-new" onclick="openModal('convenio')">+ Nuevo convenio</button>` : ''}
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" style="color:var(--purple)">${state.data.convenios.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Vigentes</div><div class="stat-value">${state.data.convenios.filter(c=>c.estado==='Vigente').length}</div></div>
-  </div>
-
-  <div class="filters-bar">
-    <div class="search-wrap"><input class="search-input" placeholder="Buscar institución..." oninput="filterTable(this,'tbl-conv',0)"></div>
-    <select class="filter-select" onchange="filterTable(this,'tbl-conv',2)">
-      <option value="">Todos los tipos</option>
-      <option>Académico</option><option>Servicio</option><option>Investigación</option>
-    </select>
-  </div>
-
-  <div class="table-card">
-    <table class="data-table" id="tbl-conv">
-      <thead><tr><th>Institución</th><th>Tipo</th><th>Estado</th><th>Firma</th><th>Vencimiento</th><th>Responsable</th>${canEdit?'<th>Acciones</th>':''}</tr></thead>
-      <tbody>
-        ${state.data.convenios.map(c => `
-        <tr data-id="${c.id}">
-          <td><strong>${c.institucion}</strong></td>
-          <td>${c.tipo}</td>
-          <td><span class="badge ${c.estado==='Vigente'?'badge-green':'badge-gray'}">${c.estado}</span></td>
-          <td>${c.firma}</td>
-          <td>${c.vencimiento}</td>
-          <td>${c.responsable}</td>
-          ${canEdit?`<td><button class="action-btn" onclick="deleteRow('convenios',${c.id})">Eliminar</button></td>`:''}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-}
-
-// ============================================================
-// CONTRATOS
-// ============================================================
-function renderContratos() {
-  const canEdit = state.currentUser.role !== 'usuario';
-  return `
-  <div class="page-header">
-    <div class="page-title-area">
-      <h2>Contratos 📄</h2>
-      <p>Contratos y acuerdos con proveedores y prestadores</p>
-    </div>
-    ${canEdit ? `<button class="btn-new" onclick="openModal('contrato')">+ Nuevo contrato</button>` : ''}
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" style="color:var(--red)">${state.data.contratos.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Activos</div><div class="stat-value">${state.data.contratos.filter(c=>c.estado==='Activo').length}</div></div>
-  </div>
-
-  <div class="filters-bar">
-    <div class="search-wrap"><input class="search-input" placeholder="Buscar proveedor..." oninput="filterTable(this,'tbl-cont',0)"></div>
-  </div>
-
-  <div class="table-card">
-    <table class="data-table" id="tbl-cont">
-      <thead><tr><th>Proveedor</th><th>Concepto</th><th>Monto</th><th>Estado</th><th>Inicio</th><th>Fin</th>${canEdit?'<th>Acciones</th>':''}</tr></thead>
-      <tbody>
-        ${state.data.contratos.map(c => `
-        <tr data-id="${c.id}">
-          <td><strong>${c.proveedor}</strong></td>
-          <td>${c.concepto}</td>
-          <td>${c.monto}</td>
-          <td><span class="badge ${c.estado==='Activo'?'badge-green':'badge-gray'}">${c.estado}</span></td>
-          <td>${c.inicio}</td>
-          <td>${c.fin}</td>
-          ${canEdit?`<td><button class="action-btn" onclick="deleteRow('contratos',${c.id})">Eliminar</button></td>`:''}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-}
-
-// ============================================================
-// USUARIOS (admin only)
-// ============================================================
-function renderUsuarios() {
-  if (state.currentUser.role !== 'admin') return '<p style="padding:40px;color:var(--red)">Acceso no autorizado.</p>';
-  const colors = { admin:'#2d5a3d', coordinador:'#2a4a7f', usuario:'#b8963e' };
-  return `
-  <div class="page-header">
-    <div class="page-title-area">
-      <h2>Usuarios 👥</h2>
-      <p>Gestión de accesos y roles del portal</p>
-    </div>
-    <button class="btn-new" onclick="openModal('usuario')">+ Nuevo usuario</button>
-  </div>
-  <div style="max-width:680px">
-    ${USERS_DB.map(u => `
-    <div class="user-card">
-      <div class="big-avatar" style="background:${colors[u.role]||'#888'}">${u.avatar}</div>
-      <div class="user-info">
-        <h5>${u.nombre}</h5>
-        <p>@${u.username} · ${capitalize(u.role)}</p>
-      </div>
-      <div class="user-card-actions">
-        <span class="badge ${u.role==='admin'?'badge-green':u.role==='coordinador'?'badge-blue':'badge-gold'}">${capitalize(u.role)}</span>
-      </div>
-    </div>`).join('')}
-  </div>`;
-}
-
-function noData(area) {
-  return `<div class="no-data"><div class="no-data-icon">📭</div><h4>Sin registros aún</h4><p>Hacé clic en "+ Nuevo" para agregar el primer registro de ${area}.</p></div>`;
-}
-
-// ============================================================
-// MODALS
-// ============================================================
-const modalForms = {
-  beca: {
-    title: '🎓 Nueva Beca',
-    fields: `
-      <div class="form-row">
-        <div class="form-group"><label>Nombre del becario/a</label><input type="text" id="f-nombre" placeholder="Apellido, Nombre"></div>
-        <div class="form-group"><label>Tipo de beca</label><select id="f-tipo"><option>Académica</option><option>Investigación</option><option>Extensión</option><option>Deportiva</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Monto mensual</label><input type="text" id="f-monto" placeholder="$0.000"></div>
-        <div class="form-group"><label>Estado</label><select id="f-estado"><option>Activa</option><option>En revisión</option><option>Finalizada</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Fecha inicio</label><input type="date" id="f-fecha"></div>
-        <div class="form-group"><label>Responsable</label><input type="text" id="f-responsable" placeholder="Apellido, Nombre"></div>
-      </div>`,
-    save: () => {
-      const obj = { id: Date.now(), nombre: v('f-nombre'), tipo: v('f-tipo'), monto: v('f-monto'), estado: v('f-estado'), fecha: v('f-fecha'), responsable: v('f-responsable') };
-      if (!obj.nombre) return alert('El nombre es obligatorio.');
-      state.data.becas.push(obj); updateCounts(); showPage('becas'); toast('Beca creada ✓');
-    }
-  },
-  proyecto: {
-    title: '🧪 Nuevo Proyecto',
-    fields: `
-      <div class="form-group"><label>Nombre del proyecto</label><input type="text" id="f-nombre" placeholder="Nombre completo"></div>
-      <div class="form-row">
-        <div class="form-group"><label>Área temática</label><input type="text" id="f-area" placeholder="Ciencias, Tecnología..."></div>
-        <div class="form-group"><label>Director/a</label><input type="text" id="f-director" placeholder="Dr/Dra. Apellido"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Estado</label><select id="f-estado"><option>Formulación</option><option>En curso</option><option>Finalizado</option></select></div>
-        <div class="form-group"><label>Fecha inicio</label><input type="date" id="f-inicio"></div>
-      </div>
-      <div class="form-group"><label>Fecha fin estimada</label><input type="date" id="f-fin"></div>`,
-    save: () => {
-      const obj = { id: Date.now(), nombre: v('f-nombre'), area: v('f-area'), director: v('f-director'), estado: v('f-estado'), inicio: v('f-inicio'), fin: v('f-fin') };
-      if (!obj.nombre) return alert('El nombre es obligatorio.');
-      state.data.proyectos.push(obj); updateCounts(); showPage('proyectos'); toast('Proyecto creado ✓');
-    }
-  },
-  pasantia: {
-    title: '💼 Nueva Pasantía',
-    fields: `
-      <div class="form-row">
-        <div class="form-group"><label>Nombre del pasante</label><input type="text" id="f-nombre" placeholder="Apellido, Nombre"></div>
-        <div class="form-group"><label>Empresa / Organización</label><input type="text" id="f-empresa" placeholder="Nombre de la empresa"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Tutor/a asignado/a</label><input type="text" id="f-tutor" placeholder="Ing./Lic. Apellido"></div>
-        <div class="form-group"><label>Estado</label><select id="f-estado"><option>Activa</option><option>Finalizada</option><option>Cancelada</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Fecha inicio</label><input type="date" id="f-inicio"></div>
-        <div class="form-group"><label>Fecha fin</label><input type="date" id="f-fin"></div>
-      </div>`,
-    save: () => {
-      const obj = { id: Date.now(), nombre: v('f-nombre'), empresa: v('f-empresa'), tutor: v('f-tutor'), estado: v('f-estado'), inicio: v('f-inicio'), fin: v('f-fin') };
-      if (!obj.nombre) return alert('El nombre es obligatorio.');
-      state.data.pasantias.push(obj); updateCounts(); showPage('pasantias'); toast('Pasantía creada ✓');
-    }
-  },
-  convenio: {
-    title: '🤝 Nuevo Convenio',
-    fields: `
-      <div class="form-group"><label>Institución</label><input type="text" id="f-inst" placeholder="Nombre de la institución"></div>
-      <div class="form-row">
-        <div class="form-group"><label>Tipo</label><select id="f-tipo"><option>Académico</option><option>Servicio</option><option>Investigación</option><option>Marco</option></select></div>
-        <div class="form-group"><label>Estado</label><select id="f-estado"><option>Vigente</option><option>En negociación</option><option>Vencido</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Fecha firma</label><input type="date" id="f-firma"></div>
-        <div class="form-group"><label>Fecha vencimiento</label><input type="date" id="f-venc"></div>
-      </div>
-      <div class="form-group"><label>Responsable institucional</label><input type="text" id="f-resp" placeholder="Nombre y cargo"></div>`,
-    save: () => {
-      const obj = { id: Date.now(), institucion: v('f-inst'), tipo: v('f-tipo'), estado: v('f-estado'), firma: v('f-firma'), vencimiento: v('f-venc'), responsable: v('f-resp') };
-      if (!obj.institucion) return alert('La institución es obligatoria.');
-      state.data.convenios.push(obj); updateCounts(); showPage('convenios'); toast('Convenio creado ✓');
-    }
-  },
-  contrato: {
-    title: '📄 Nuevo Contrato',
-    fields: `
-      <div class="form-row">
-        <div class="form-group"><label>Proveedor / Prestador</label><input type="text" id="f-prov" placeholder="Nombre o razón social"></div>
-        <div class="form-group"><label>Concepto</label><input type="text" id="f-conc" placeholder="Servicio o producto"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Monto total</label><input type="text" id="f-monto" placeholder="$0.000"></div>
-        <div class="form-group"><label>Estado</label><select id="f-estado"><option>Activo</option><option>En revisión</option><option>Finalizado</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Fecha inicio</label><input type="date" id="f-inicio"></div>
-        <div class="form-group"><label>Fecha fin</label><input type="date" id="f-fin"></div>
-      </div>`,
-    save: () => {
-      const obj = { id: Date.now(), proveedor: v('f-prov'), concepto: v('f-conc'), monto: v('f-monto'), estado: v('f-estado'), inicio: v('f-inicio'), fin: v('f-fin') };
-      if (!obj.proveedor) return alert('El proveedor es obligatorio.');
-      state.data.contratos.push(obj); updateCounts(); showPage('contratos'); toast('Contrato creado ✓');
-    }
-  },
-  usuario: {
-    title: '👤 Nuevo Usuario',
-    fields: `
-      <div class="form-row">
-        <div class="form-group"><label>Nombre completo</label><input type="text" id="f-nombre" placeholder="Apellido, Nombre"></div>
-        <div class="form-group"><label>Usuario</label><input type="text" id="f-user" placeholder="nombre.apellido"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Contraseña</label><input type="password" id="f-pass" placeholder="••••••••"></div>
-        <div class="form-group"><label>Rol</label><select id="f-role"><option value="usuario">Usuario</option><option value="coordinador">Coordinador</option><option value="admin">Administrador</option></select></div>
-      </div>`,
-    save: () => {
-      const nombre = v('f-nombre'); const username = v('f-user'); const password = v('f-pass'); const role = v('f-role');
-      if (!nombre || !username || !password) return alert('Completá todos los campos.');
-      const initials = nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-      USERS_DB.push({ id: Date.now(), username, password, nombre, role, avatar: initials, color: '#888' });
-      showPage('usuarios'); toast('Usuario creado ✓');
-    }
-  }
+// ══════════════════════════════════════════════
+const AREA_META = {
+  becas:      {label:'Becas Estudiantiles',  icon:'🎓', color:'var(--gold)',      bg:'var(--gold-bg)',      desc:'Becas estudiantiles de extensión'},
+  rrhh_beca:    {label:'Beca Docente',          icon:'🎓', color:'var(--sapphire)',  bg:'var(--sapphire-bg)', desc:'Becas docentes activas'},
+  rrhh_contrato:{label:'Contratos',             icon:'📋', color:'var(--gold)',      bg:'var(--gold-bg)',     desc:'Contratos de personal'},
+  rrhh_codigo:  {label:'Código',                icon:'🏛️', color:'var(--violet)',    bg:'var(--violet-bg)',   desc:'Personal con cargo por código'},
+  propiedad:  {label:'Prop. Intelectual',    icon:'💡', color:'var(--violet)',    bg:'var(--violet-bg)',   desc:'Patentes, marcas y registros'},
+  proyectos:  {label:'Proyectos',            icon:'🧪', color:'var(--forest)',    bg:'var(--forest-bg)',   desc:'Proyectos de extensión'},
+  pasantias:  {label:'Pasantías',            icon:'💼', color:'var(--teal)',      bg:'var(--teal-bg)',     desc:'Pasantías estudiantiles'},
+  convenios:  {label:'Convenios',            icon:'🤝', color:'var(--ruby)',      bg:'var(--ruby-bg)',     desc:'Acuerdos interinstitucionales'},
 };
 
-let currentModalType = null;
-
-function openModal(type) {
-  currentModalType = type;
-  const form = modalForms[type];
-  document.getElementById('modal-title').textContent = form.title;
-  document.getElementById('modal-body').innerHTML = form.fields;
-  document.getElementById('modal-save-btn').onclick = () => { form.save(); closeModal(); };
-  document.getElementById('modal').classList.add('open');
+function go(page) {
+  S.page = page;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.getAttribute('onclick')===`go('${page}')`) b.classList.add('active');
+  });
+  const renders = {dashboard:rDash, becas:rBecas, rrhh:rRrhh, propiedad:rPropiedad,
+    proyectos:rProyectos, pasantias:rPasantias, convenios:rConvenios, usuarios:rUsuarios};
+  S.rrhhTab = S.rrhhTab || 'beca';
+  document.getElementById('content').innerHTML = renders[page] ? renders[page]() : '';
 }
 
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
+function refreshCounts() {
+  Object.keys(S.data).forEach(k=>{
+    const el=document.getElementById('c-'+k); if(el) el.textContent=S.data[k].length;
+  });
+  // RRHH total across 3 sub-areas
+  const rrhhEl=document.getElementById('c-rrhh');
+  if(rrhhEl) rrhhEl.textContent=(S.data.rrhh_beca||[]).length+(S.data.rrhh_contrato||[]).length+(S.data.rrhh_codigo||[]).length;
 }
 
-function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+// ══════════════════════════════════════════════
+// SHARED HELPERS
+// ══════════════════════════════════════════════
+const canEdit = ()=>S.user && ['admin','coordinador'].includes(S.user.role);
 
-// ============================================================
-// TABLE FILTER
-// ============================================================
-function filterTable(input, tableId, col) {
-  const val = (input.value || '').toLowerCase();
-  const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-  rows.forEach(r => {
-    const cell = r.cells[col];
-    r.style.display = (!val || (cell && cell.textContent.toLowerCase().includes(val))) ? '' : 'none';
+function bStatus(s) {
+  const m={'Activa':'b-green','Activo':'b-green','Vigente':'b-green','En curso':'b-green','Registrado':'b-green',
+    'En revisión':'b-gold','En trámite':'b-gold','Formulación':'b-gold','En negociación':'b-gold',
+    'Finalizada':'b-gray','Finalizado':'b-gray','Vencido':'b-gray','Inactivo':'b-gray',
+    'Cancelada':'b-red','Cancelado':'b-red'};
+  return `<span class="badge ${m[s]||'b-gray'}">${s}</span>`;
+}
+
+function fKey(area,id){return `${area}_${id}`}
+function getFiles(area,id){return S.files[fKey(area,id)]||[]}
+function fbadge(area,id){
+  const n=getFiles(area,id).length;
+  return `<button class="fbadge${n===0?' empty':''}" onclick="openFiles('${area}',${id})">📎 ${n===0?'Adjuntar':`${n} archivo${n!==1?'s':''}`}</button>`;
+}
+function fmtSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB'}
+function fIcon(t){if(!t)return'📄';if(t.includes('pdf'))return'📕';if(t.includes('word')||t.includes('document'))return'📘';if(t.includes('image'))return'🖼️';if(t.includes('sheet')||t.includes('excel')||t.includes('csv'))return'📗';if(t.includes('zip'))return'🗜️';if(t.includes('text'))return'📝';return'📄'}
+function nodata(a){return`<div class="nodata"><div class="nodata-ico">📭</div><h4>Sin registros</h4><p>Hacé clic en "+ Nuevo" para agregar el primer registro en ${a}.</p></div>`}
+
+function filterRows(inp, tid) {
+  const v=(inp.value||'').toLowerCase();
+  document.querySelectorAll(`#${tid} tbody tr`).forEach(r=>{
+    r.classList.toggle('hidden-row', v!==''&&!r.textContent.toLowerCase().includes(v));
   });
 }
 
-function deleteRow(area, id) {
-  if (!confirm('¿Eliminar este registro?')) return;
-  state.data[area] = state.data[area].filter(x => x.id !== id);
-  updateCounts();
-  showPage(area);
-  toast('Registro eliminado');
+// ══════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════
+function rDash(){
+  const keys=Object.keys(AREA_META);
+  const rrhhTotal=(S.data.rrhh_beca||[]).length+(S.data.rrhh_contrato||[]).length+(S.data.rrhh_codigo||[]).length;
+  const total=keys.filter(k=>!k.startsWith('rrhh_')).reduce((a,k)=>a+S.data[k].length,0)+rrhhTotal;
+  return`<div class="ph"><div class="ph-left"><h2>Bienvenida, ${S.user.nombre.split(' ')[0]} 👋</h2><p>Panel de control — Secretaría de Extensión Universitaria</p></div></div>
+  <div class="stats">
+    <div class="scard"><div class="scard-lbl">Total registros</div><div class="scard-val">${total}</div><div class="scard-sub">en todas las áreas</div></div>
+    <div class="scard" style="cursor:pointer" onclick="go('rrhh')"><div class="scard-lbl">Recursos Humanos</div><div class="scard-val" style="color:var(--sapphire)">${rrhhTotal}</div><div class="scard-sub">Beca docente, contratos y código</div></div>
+    ${keys.filter(k=>!k.startsWith('rrhh_')).map(k=>`<div class="scard" style="cursor:pointer" onclick="go('${k}')"><div class="scard-lbl">${AREA_META[k].label}</div><div class="scard-val" style="color:${AREA_META[k].color}">${S.data[k].length}</div><div class="scard-sub">${AREA_META[k].desc}</div></div>`).join('')}
+  </div>
+  <div class="dash-grid">
+    <div class="dcard"><h4>🗂 Áreas del sistema</h4>${keys.map(k=>`
+      <div class="area-row" onclick="go('${k}')">
+        <div class="area-ico" style="background:${AREA_META[k].bg}">${AREA_META[k].icon}</div>
+        <div class="area-info"><h5>${AREA_META[k].label}</h5><p>${S.data[k].length} registro${S.data[k].length!==1?'s':''} — ${AREA_META[k].desc}</p></div>
+        <span style="margin-left:auto;color:var(--ink-muted);font-size:16px">›</span>
+      </div>`).join('')}</div>
+    <div class="dcard"><h4>🕓 Actividad reciente</h4>
+      ${[...S.data.becas,...S.data.proyectos,...S.data.pasantias,...S.data.convenios].slice(-6).reverse().map(r=>`
+      <div class="rec-item">
+        <div><div class="rec-title">${r.nombre||r.titulo||r.institucion||'—'}</div><div class="rec-sub">${r.tipo||r.area||r.empresa||r.cargo||'—'}</div></div>
+        ${bStatus(r.estado)}
+      </div>`).join('')}
+    </div>
+  </div>`;
 }
 
-// ============================================================
-// TOAST
-// ============================================================
-function toast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast show ${type}`;
-  setTimeout(() => t.className = 'toast', 2800);
+// ══════════════════════════════════════════════
+// BECAS ESTUDIANTILES
+// ══════════════════════════════════════════════
+function rBecas(){
+  const e=canEdit();
+  return`<div class="ph">
+    <div class="ph-left"><h2>Becas Estudiantiles 🎓</h2><p>Gestión de becas estudiantiles de extensión universitaria</p></div>
+    <div class="ph-right">
+      ${e?`<button class="btn-new" onclick="openForm('beca')">+ Nueva beca</button>`:''}
+      ${reportBtn('becas')}
+    </div></div>
+  <div class="stats">
+    <div class="scard"><div class="scard-lbl">Total</div><div class="scard-val" style="color:var(--gold)">${S.data.becas.length}</div></div>
+    <div class="scard"><div class="scard-lbl">Activas</div><div class="scard-val">${S.data.becas.filter(b=>b.estado==='Activa').length}</div></div>
+    <div class="scard"><div class="scard-lbl">En revisión</div><div class="scard-val">${S.data.becas.filter(b=>b.estado==='En revisión').length}</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, DNI, carrera, tipo..." oninput="filterRows(this,'t-becas')"></div>
+    <select class="fsel" onchange="filterByCol(this,'t-becas',6)"><option value="">Todos los estados</option><option>Activa</option><option>En revisión</option><option>Finalizada</option></select>
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="t-becas">
+    <thead><tr><th>Nombre</th><th>DNI</th><th>Carrera</th><th>Tipo</th><th>Monto</th><th>Inicio</th><th>Estado</th><th>Responsable</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
+    <tbody>${S.data.becas.map(r=>`<tr data-id="${r.id}">
+      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td><td>${r.carrera}</td><td>${r.tipo}</td><td>${r.monto}</td><td>${r.inicio}</td>
+      <td>${bStatus(r.estado)}</td><td>${r.responsable}</td><td>${fbadge('becas',r.id)}</td>
+      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('beca',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('becas',${r.id})">✕</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${S.data.becas.length===0?nodata('becas'):''}</div>`;
 }
 
-// Close modal on overlay click
-document.getElementById('modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
+// ══════════════════════════════════════════════
+// RECURSOS HUMANOS — 3 pestañas
+// ══════════════════════════════════════════════
+function rRrhh(){
+  if(!S.rrhhTab) S.rrhhTab='beca';
+  const e=canEdit();
+  const tabs=[
+    {key:'beca',     label:'🎓 Beca Docente'},
+    {key:'contrato', label:'📋 Contratos'},
+    {key:'codigo',   label:'🏛️ Código'},
+  ];
+  const tabBar=`<div style="display:flex;gap:4px;margin-bottom:22px;border-bottom:2px solid var(--line);padding-bottom:0">
+    ${tabs.map(t=>`<button onclick="setRrhhTab('${t.key}')" style="padding:10px 20px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid ${S.rrhhTab===t.key?'var(--sapphire)':'transparent'};margin-bottom:-2px;color:${S.rrhhTab===t.key?'var(--sapphire)':'var(--ink-muted)'};transition:all .15s">${t.label}</button>`).join('')}
+  </div>`;
+
+  const total=(S.data.rrhh_beca||[]).length+(S.data.rrhh_contrato||[]).length+(S.data.rrhh_codigo||[]).length;
+
+  let tabContent='';
+  if(S.rrhhTab==='beca')     tabContent=rRrhhBeca(e);
+  if(S.rrhhTab==='contrato') tabContent=rRrhhContrato(e);
+  if(S.rrhhTab==='codigo')   tabContent=rRrhhCodigo(e);
+
+  return`<div class="ph">
+    <div class="ph-left"><h2>Recursos Humanos 👥</h2><p>Personal de la Secretaría de Extensión Universitaria</p></div>
+  </div>
+  <div class="stats">
+    <div class="scard"><div class="scard-lbl">Total personal</div><div class="scard-val" style="color:var(--sapphire)">${total}</div></div>
+    <div class="scard"><div class="scard-lbl">Beca Docente</div><div class="scard-val">${(S.data.rrhh_beca||[]).length}</div></div>
+    <div class="scard"><div class="scard-lbl">Contratos</div><div class="scard-val">${(S.data.rrhh_contrato||[]).length}</div></div>
+    <div class="scard"><div class="scard-lbl">Código</div><div class="scard-val">${(S.data.rrhh_codigo||[]).length}</div></div>
+  </div>
+  ${tabBar}
+  ${tabContent}`;
+}
+
+function setRrhhTab(tab){
+  S.rrhhTab=tab;
+  go('rrhh');
+}
+
+function rRrhhBeca(e){
+  const data=S.data.rrhh_beca||[];
+  return`<div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, DNI, categoría..." oninput="filterRows(this,'t-rb')"></div>
+    <select class="fsel" onchange="filterByCol(this,'t-rb',4)"><option value="">Todos los estados</option><option>Activa</option><option>Inactiva</option><option>Suspendida</option></select>
+    ${e?`<button class="btn-new" style="margin-left:auto" onclick="openForm('rrhh_beca')">+ Nueva beca docente</button>`:''}
+    ${reportBtn('rrhh_beca')}
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="t-rb">
+    <thead><tr><th>Nombre</th><th>DNI</th><th>Categoría</th><th>Dedicación</th><th>Estado</th><th>Inicio</th><th>Resolución</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
+    <tbody>${data.map(r=>`<tr data-id="${r.id}">
+      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td><td>${r.categoria}</td><td>${r.dedicacion}</td>
+      <td>${bStatus(r.estado)}</td><td>${r.inicio}</td>
+      <td><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">${r.resolucion}</span></td>
+      <td>${fbadge('rrhh_beca',r.id)}</td>
+      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('rrhh_beca',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('rrhh_beca',${r.id})">✕</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${data.length===0?nodata('Beca Docente'):''}</div>`;
+}
+
+function rRrhhContrato(e){
+  const data=S.data.rrhh_contrato||[];
+  return`<div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, DNI, cargo..." oninput="filterRows(this,'t-rc')"></div>
+    <select class="fsel" onchange="filterByCol(this,'t-rc',4)"><option value="">Todos los estados</option><option>Vigente</option><option>Vencido</option><option>Rescindido</option></select>
+    ${e?`<button class="btn-new" style="margin-left:auto" onclick="openForm('rrhh_contrato')">+ Nuevo contrato</button>`:''}
+    ${reportBtn('rrhh_contrato')}
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="t-rc">
+    <thead><tr><th>Nombre</th><th>DNI</th><th>Cargo</th><th>Monto</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
+    <tbody>${data.map(r=>`<tr data-id="${r.id}">
+      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td><td>${r.cargo}</td><td>${r.monto}</td>
+      <td>${bStatus(r.estado)}</td><td>${r.inicio}</td><td>${r.fin}</td>
+      <td>${fbadge('rrhh_contrato',r.id)}</td>
+      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('rrhh_contrato',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('rrhh_contrato',${r.id})">✕</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${data.length===0?nodata('Contratos'):''}</div>`;
+}
+
+function rRrhhCodigo(e){
+  const data=S.data.rrhh_codigo||[];
+  return`<div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, DNI, código..." oninput="filterRows(this,'t-rk')"></div>
+    <select class="fsel" onchange="filterByCol(this,'t-rk',4)"><option value="">Todos los estados</option><option>Activo</option><option>Inactivo</option><option>Licencia</option></select>
+    ${e?`<button class="btn-new" style="margin-left:auto" onclick="openForm('rrhh_codigo')">+ Nuevo registro</button>`:''}
+    ${reportBtn('rrhh_codigo')}
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="t-rk">
+    <thead><tr><th>Nombre</th><th>DNI</th><th>Código</th><th>Categoría</th><th>Estado</th><th>Dedicación</th><th>Inicio</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
+    <tbody>${data.map(r=>`<tr data-id="${r.id}">
+      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td>
+      <td><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">${r.codigo}</span></td>
+      <td>${r.categoria}</td><td>${bStatus(r.estado)}</td><td>${r.dedicacion}</td><td>${r.inicio}</td>
+      <td>${fbadge('rrhh_codigo',r.id)}</td>
+      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('rrhh_codigo',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('rrhh_codigo',${r.id})">✕</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${data.length===0?nodata('Código'):''}</div>`;
+}
+
+// ══════════════════════════════════════════════
+// PROPIEDAD INTELECTUAL
+// ══════════════════════════════════════════════
+function rPropiedad(){
+  const e=canEdit();
+  return`<div class="ph">
+    <div class="ph-left"><h2>Propiedad Intelectual 💡</h2><p>Patentes, marcas, software y registros de propiedad intelectual</p></div>
+    <div class="ph-right">
+      ${e?`<button class="btn-new" onclick="openForm('propiedad')">+ Nuevo registro</button>`:''}
+      ${reportBtn('propiedad')}
+    </div></div>
+  <div class="stats">
+    <div class="scard"><div class="scard-lbl">Total</div><div class="scard-val" style="color:var(--violet)">${S.data.propiedad.length}</div></div>
+    <div class="scard"><div class="scard-lbl">Patentes</div><div class="scard-val">${S.data.propiedad.filter(r=>r.tipo==='Patente').length}</div></div>
+    <div class="scard"><div class="scard-lbl">Registrados</div><div class="scard-val">${S.data.propiedad.filter(r=>r.estado==='Registrado').length}</div></div>
+    <div class="scard"><div class="scard-lbl">En trámite</div><div class="scard-val">${S.data.propiedad.filter(r=>r.estado==='En trámite').length}</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por título, autores, expediente..." oninput="filterRows(this,'t-prop')"></div>
+    <select class="fsel" onchange="filterByCol(this,'t-prop',2)"><option value="">Todos los tipos</option><option>Patente</option><option>Marca</option><option>Software</option><option>Diseño Industrial</option></select>
+    <select class="fsel" onchange="filterByCol(this,'t-prop',4)"><option value="">Todos los estados</option><option>En trámite</option><option>Registrado</option><option>Denegado</option></select>
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="t-prop">
+    <thead><tr><th>Título</th><th>Autores</th><th>Tipo</th><th>Nro. Expediente</th><th>Estado</th><th>Fecha</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
+    <tbody>${S.data.propiedad.map(r=>`<tr data-id="${r.id}">
+      <td><strong>${r.titulo}</strong></td><td>${r.autores}</td><td>${r.tipo}</td>
+      <td><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">${r.nroExp}</span></td>
+      <td>${bStatus(r.estado)}</td><td>${r.fecha}</td><td>${fbadge('propiedad',r.id)}</td>
+      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('propiedad',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('propiedad',${r.id})">✕</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${S.data.propiedad.length===0?nodata('propiedad'):''}</div>`;
+}
+
+// ══════════════════════════════════════════════
+// PROYECTOS
+// ══════════════════════════════════════════════
+function rProyectos(){
+  const e=canEdit();
+  return`<div class="ph">
+    <div class="ph-left"><h2>Proyectos 🧪</h2><p>Proyectos de extensión e investigación</p></div>
+    <div class="ph-right">
+      ${e?`<button class="btn-new" onclick="openForm('proyecto')">+ Nuevo proyecto</button>`:''}
+      ${reportBtn('proyectos')}
+    </div></div>
+  <div class="stats">
+    <div class="scard"><div class="scard-lbl">Total</div><div class="scard-val" style="color:var(--forest)">${S.data.proyectos.length}</div></div>
+    <div class="scard"><div class="scard-lbl">En curso</div><div class="scard-val">${S.data.proyectos.filter(r=>r.estado==='En curso').length}</div></div>
+    <div class="scard"><div class="scard-lbl">Formulación</div><div class="scard-val">${S.data.proyectos.filter(r=>r.estado==='Formulación').length}</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, área, director, financiamiento..." oninput="filterRows(this,'t-proy')"></div>
+    <select class="fsel" onchange="filterByCol(this,'t-proy',3)"><option value="">Todos los estados</option><option>Formulación</option><option>En curso</option><option>Finalizado</option></select>
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="t-proy">
+    <thead><tr><th>Nombre</th><th>Área</th><th>Director/a</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Financiamiento</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
+    <tbody>${S.data.proyectos.map(r=>`<tr data-id="${r.id}">
+      <td><strong>${r.nombre}</strong></td><td>${r.area}</td><td>${r.director}</td><td>${bStatus(r.estado)}</td>
+      <td>${r.inicio}</td><td>${r.fin}</td><td>${r.financiamiento}</td><td>${fbadge('proyectos',r.id)}</td>
+      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('proyecto',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('proyectos',${r.id})">✕</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${S.data.proyectos.length===0?nodata('proyectos'):''}</div>`;
+}
+
+// ══════════════════════════════════════════════
+// PASANTÍAS
+// ══════════════════════════════════════════════
+function rPasantias(){
+  const e=canEdit();
+  return`<div class="ph">
+    <div class="ph-left"><h2>Pasantías 💼</h2><p>Vinculación laboral y pasantías estudiantiles</p></div>
+    <div class="ph-right">
+      ${e?`<button class="btn-new" onclick="openForm('pasantia')">+ Nueva pasantía</button>`:''}
+      ${reportBtn('pasantias')}
+    </div></div>
+  <div class="stats">
+    <div class="scard"><div class="scard-lbl">Total</div><div class="scard-val" style="color:var(--teal)">${S.data.pasantias.length}</div></div>
+    <div class="scard"><div class="scard-lbl">Activas</div><div class="scard-val">${S.data.pasantias.filter(r=>r.estado==='Activa').length}</div></div>
+    <div class="scard"><div class="scard-lbl">Finalizadas</div><div class="scard-val">${S.data.pasantias.filter(r=>r.estado==='Finalizada').length}</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, empresa, carrera, tutor..." oninput="filterRows(this,'t-pas')"></div>
+    <select class="fsel" onchange="filterByCol(this,'t-pas',5)"><option value="">Todos los estados</option><option>Activa</option><option>Finalizada</option><option>Cancelada</option></select>
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="t-pas">
+    <thead><tr><th>Pasante</th><th>DNI</th><th>Carrera</th><th>Empresa</th><th>Tutor/a</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
+    <tbody>${S.data.pasantias.map(r=>`<tr data-id="${r.id}">
+      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td><td>${r.carrera}</td><td>${r.empresa}</td>
+      <td>${r.tutor}</td><td>${bStatus(r.estado)}</td><td>${r.inicio}</td><td>${r.fin}</td><td>${fbadge('pasantias',r.id)}</td>
+      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('pasantia',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('pasantias',${r.id})">✕</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${S.data.pasantias.length===0?nodata('pasantías'):''}</div>`;
+}
+
+// ══════════════════════════════════════════════
+// CONVENIOS
+// ══════════════════════════════════════════════
+function rConvenios(){
+  const e=canEdit();
+  return`<div class="ph">
+    <div class="ph-left"><h2>Convenios 🤝</h2><p>Acuerdos interinstitucionales y marcos de cooperación</p></div>
+    <div class="ph-right">
+      ${e?`<button class="btn-new" onclick="openForm('convenio')">+ Nuevo convenio</button>`:''}
+      ${reportBtn('convenios')}
+    </div></div>
+  <div class="stats">
+    <div class="scard"><div class="scard-lbl">Total</div><div class="scard-val" style="color:var(--ruby)">${S.data.convenios.length}</div></div>
+    <div class="scard"><div class="scard-lbl">Vigentes</div><div class="scard-val">${S.data.convenios.filter(r=>r.estado==='Vigente').length}</div></div>
+    <div class="scard"><div class="scard-lbl">En negociación</div><div class="scard-val">${S.data.convenios.filter(r=>r.estado==='En negociación').length}</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por institución, tipo, responsable..." oninput="filterRows(this,'t-conv')"></div>
+    <select class="fsel" onchange="filterByCol(this,'t-conv',1)"><option value="">Todos los tipos</option><option>Académico</option><option>Servicio</option><option>Investigación</option><option>Marco</option><option>Específico</option></select>
+    <select class="fsel" onchange="filterByCol(this,'t-conv',2)"><option value="">Todos los estados</option><option>Vigente</option><option>En negociación</option><option>Vencido</option></select>
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="t-conv">
+    <thead><tr><th>Institución</th><th>Tipo</th><th>Estado</th><th>Firma</th><th>Vencimiento</th><th>Responsable</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
+    <tbody>${S.data.convenios.map(r=>`<tr data-id="${r.id}">
+      <td><strong>${r.institucion}</strong></td><td>${r.tipo}</td><td>${bStatus(r.estado)}</td>
+      <td>${r.firma}</td><td>${r.vencimiento}</td><td>${r.responsable}</td><td>${fbadge('convenios',r.id)}</td>
+      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('convenio',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('convenios',${r.id})">✕</button></td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${S.data.convenios.length===0?nodata('convenios'):''}</div>`;
+}
+
+// ══════════════════════════════════════════════
+// USUARIOS (solo admin)
+// ══════════════════════════════════════════════
+function rUsuarios(){
+  if(S.user.role!=='admin') return '<p style="padding:40px;color:var(--ruby)">Acceso no autorizado.</p>';
+  const colors={admin:'#1e4d35',coordinador:'#1d3f7a',usuario:'#c17f24'};
+  return`<div class="ph"><div class="ph-left"><h2>Usuarios 🔑</h2><p>Gestión de accesos y roles del portal</p></div>
+    <div class="ph-right"><button class="btn-new" onclick="openForm('usuario')">+ Nuevo usuario</button></div></div>
+  <div style="max-width:680px">
+    ${USERS.map(u=>`<div class="ucard">
+      <div class="uav" style="background:${colors[u.role]||'#888'}">${u.av}</div>
+      <div class="uinfo"><h5>${u.nombre}</h5><p>@${u.username} · ${cap(u.role)}</p></div>
+      <div class="ucard-r"><span class="badge ${u.role==='admin'?'b-green':u.role==='coordinador'?'b-blue':'b-gold'}">${cap(u.role)}</span></div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// FORMS CONFIG
+// ══════════════════════════════════════════════
+const FORMS = {
+  beca:{
+    title:'🎓 Beca Estudiantil', area:'becas',
+    fields:`<div class="frow">
+      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="González, Juan"></div>
+      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Carrera</label><input id="f2" type="text" placeholder="Nombre de la carrera"></div>
+      <div class="fgroup"><label>Tipo de beca</label><select id="f3"><option>Académica</option><option>Investigación</option><option>Extensión</option><option>Deportiva</option><option>Socioeconómica</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Monto mensual</label><input id="f4" type="text" placeholder="$0.000"></div>
+      <div class="fgroup"><label>Estado</label><select id="f5"><option>Activa</option><option>En revisión</option><option>Finalizada</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Fecha inicio</label><input id="f6" type="date"></div>
+      <div class="fgroup"><label>Responsable</label><input id="f7" type="text" placeholder="Nombre del responsable"></div>
+    </div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f8" placeholder="Notas adicionales..."></textarea></div>`,
+    keys:['nombre','dni','carrera','tipo','monto','estado','inicio','responsable','obs'],
+    required:[0],
+  },
+  rrhh_beca:{
+    title:'🎓 Beca Docente', area:'rrhh_beca',
+    fields:`<div class="frow">
+      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="Apellido, Nombre"></div>
+      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Categoría docente</label><input id="f2" type="text" placeholder="Prof. Titular, JTP, Ayudante..."></div>
+      <div class="fgroup"><label>Dedicación</label><select id="f3"><option>Simple</option><option>Semiexclusiva</option><option>Exclusiva</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Estado</label><select id="f4"><option>Activa</option><option>Inactiva</option><option>Suspendida</option></select></div>
+      <div class="fgroup"><label>Resolución</label><input id="f5" type="text" placeholder="RES-YYYY-000"></div>
+    </div>
+    <div class="fgroup"><label>Fecha inicio</label><input id="f6" type="date"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f7" placeholder="Notas..."></textarea></div>`,
+    keys:['nombre','dni','categoria','dedicacion','estado','resolucion','inicio','obs'],
+    required:[0],
+  },
+  rrhh_contrato:{
+    title:'📋 Contrato', area:'rrhh_contrato',
+    fields:`<div class="frow">
+      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="Apellido, Nombre"></div>
+      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Cargo / Función</label><input id="f2" type="text" placeholder="Asesor, Técnico, Administrativo..."></div>
+      <div class="fgroup"><label>Monto mensual</label><input id="f3" type="text" placeholder="$0.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Estado</label><select id="f4"><option>Vigente</option><option>Vencido</option><option>Rescindido</option></select></div>
+      <div class="fgroup"><label>Fecha inicio</label><input id="f5" type="date"></div>
+    </div>
+    <div class="fgroup"><label>Fecha fin</label><input id="f6" type="date"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f7" placeholder="Notas..."></textarea></div>`,
+    keys:['nombre','dni','cargo','monto','estado','inicio','fin','obs'],
+    required:[0],
+  },
+  rrhh_codigo:{
+    title:'🏛️ Cargo por Código', area:'rrhh_codigo',
+    fields:`<div class="frow">
+      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="Apellido, Nombre"></div>
+      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Código de cargo</label><input id="f2" type="text" placeholder="COD-000"></div>
+      <div class="fgroup"><label>Categoría</label><input id="f3" type="text" placeholder="Titular, Asociado, Adjunto..."></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Dedicación</label><select id="f4"><option>Simple</option><option>Semiexclusiva</option><option>Exclusiva</option></select></div>
+      <div class="fgroup"><label>Estado</label><select id="f5"><option>Activo</option><option>Inactivo</option><option>Licencia</option></select></div>
+    </div>
+    <div class="fgroup"><label>Fecha ingreso</label><input id="f6" type="date"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f7" placeholder="Notas..."></textarea></div>`,
+    keys:['nombre','dni','codigo','categoria','dedicacion','estado','inicio','obs'],
+    required:[0],
+  },
+  propiedad:{
+    title:'💡 Propiedad Intelectual', area:'propiedad',
+    fields:`<div class="fgroup"><label>Título de la creación</label><input id="f0" type="text" placeholder="Nombre completo de la obra/invención"></div>
+    <div class="frow">
+      <div class="fgroup"><label>Tipo</label><select id="f1"><option>Patente</option><option>Marca</option><option>Software</option><option>Diseño Industrial</option><option>Obra Literaria</option></select></div>
+      <div class="fgroup"><label>Estado</label><select id="f2"><option>En trámite</option><option>Registrado</option><option>Denegado</option><option>Caducado</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Autores / Inventores</label><input id="f3" type="text" placeholder="Apellido, Nombre; ..."></div>
+      <div class="fgroup"><label>Nro. Expediente</label><input id="f4" type="text" placeholder="EXP-YYYY-000"></div>
+    </div>
+    <div class="fgroup"><label>Fecha de presentación</label><input id="f5" type="date"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f6" placeholder="Notas..."></textarea></div>`,
+    keys:['titulo','tipo','estado','autores','nroExp','fecha','obs'],
+    required:[0],
+  },
+  proyecto:{
+    title:'🧪 Proyecto', area:'proyectos',
+    fields:`<div class="fgroup"><label>Nombre del proyecto</label><input id="f0" type="text" placeholder="Nombre completo"></div>
+    <div class="frow">
+      <div class="fgroup"><label>Área temática</label><input id="f1" type="text" placeholder="Ciencias, Tecnología, Social..."></div>
+      <div class="fgroup"><label>Director/a</label><input id="f2" type="text" placeholder="Dr/Dra. Apellido"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Estado</label><select id="f3"><option>Formulación</option><option>En curso</option><option>Finalizado</option><option>Suspendido</option></select></div>
+      <div class="fgroup"><label>Financiamiento</label><input id="f4" type="text" placeholder="UNC, CONICET, SPU..."></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Fecha inicio</label><input id="f5" type="date"></div>
+      <div class="fgroup"><label>Fecha fin estimada</label><input id="f6" type="date"></div>
+    </div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f7" placeholder="Notas..."></textarea></div>`,
+    keys:['nombre','area','director','estado','financiamiento','inicio','fin','obs'],
+    required:[0],
+  },
+  pasantia:{
+    title:'💼 Pasantía', area:'pasantias',
+    fields:`<div class="frow">
+      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="Apellido, Nombre"></div>
+      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Carrera</label><input id="f2" type="text" placeholder="Nombre de la carrera"></div>
+      <div class="fgroup"><label>Empresa / Organización</label><input id="f3" type="text" placeholder="Nombre de la empresa"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Tutor/a</label><input id="f4" type="text" placeholder="Ing./Lic. Apellido"></div>
+      <div class="fgroup"><label>Estado</label><select id="f5"><option>Activa</option><option>Finalizada</option><option>Cancelada</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Fecha inicio</label><input id="f6" type="date"></div>
+      <div class="fgroup"><label>Fecha fin</label><input id="f7" type="date"></div>
+    </div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f8" placeholder="Notas..."></textarea></div>`,
+    keys:['nombre','dni','carrera','empresa','tutor','estado','inicio','fin','obs'],
+    required:[0],
+  },
+  convenio:{
+    title:'🤝 Convenio', area:'convenios',
+    fields:`<div class="fgroup"><label>Institución</label><input id="f0" type="text" placeholder="Nombre completo de la institución"></div>
+    <div class="frow">
+      <div class="fgroup"><label>Tipo</label><select id="f1"><option>Académico</option><option>Servicio</option><option>Investigación</option><option>Marco</option><option>Específico</option></select></div>
+      <div class="fgroup"><label>Estado</label><select id="f2"><option>Vigente</option><option>En negociación</option><option>Vencido</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Fecha firma</label><input id="f3" type="date"></div>
+      <div class="fgroup"><label>Fecha vencimiento</label><input id="f4" type="date"></div>
+    </div>
+    <div class="fgroup"><label>Responsable institucional</label><input id="f5" type="text" placeholder="Nombre y cargo"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f6" placeholder="Notas..."></textarea></div>`,
+    keys:['institucion','tipo','estado','firma','vencimiento','responsable','obs'],
+    required:[0],
+  },
+  usuario:{
+    title:'🔑 Nuevo Usuario', area:null,
+    fields:`<div class="frow">
+      <div class="fgroup"><label>Nombre completo</label><input id="f0" type="text" placeholder="Apellido, Nombre"></div>
+      <div class="fgroup"><label>Usuario</label><input id="f1" type="text" placeholder="nombre.apellido"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Contraseña</label><input id="f2" type="password" placeholder="••••••••"></div>
+      <div class="fgroup"><label>Rol</label><select id="f3"><option value="coordinador">Coordinador</option><option value="admin">Administrador</option></select></div>
+    </div>`,
+    keys:['nombre','username','pass','role'],
+    required:[0,1,2],
+  },
+};
+
+let _editId = null;
+
+function openForm(type, editId=null) {
+  _editId = editId;
+  const F = FORMS[type];
+  document.getElementById('modal-title').textContent = editId ? F.title.replace('Nuevo ','Editar ').replace('Nueva ','Editar ') : F.title;
+  document.getElementById('modal-body').innerHTML = F.fields;
+  document.getElementById('modal-foot').style.display='';
+  document.getElementById('modal-save').onclick = ()=>saveForm(type);
+
+  // populate for edit
+  if (editId && F.area) {
+    const rec = S.data[F.area].find(r=>r.id==editId);
+    if (rec) F.keys.forEach((k,i)=>{const el=document.getElementById('f'+i);if(el)el.value=rec[k]||''});
+  }
+  document.getElementById('overlay').classList.add('open');
+}
+
+function saveForm(type) {
+  const F = FORMS[type];
+  for (const i of F.required) {
+    const el=document.getElementById('f'+i);
+    if (!el||!el.value.trim()) { showToast('Completá los campos obligatorios','err'); return; }
+  }
+
+  if (type==='usuario') {
+    const n=gv('f0'),u=gv('f1'),p=gv('f2'),r=gv('f3');
+    const initials=n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    USERS.push({id:Date.now(),username:u,pass:p,nombre:n,role:r,av:initials,color:'#888'});
+    closeModal(); go('usuarios'); showToast('Usuario creado ✓'); return;
+  }
+
+  const obj={id:_editId||Date.now()};
+  F.keys.forEach((k,i)=>{ obj[k]=gv('f'+i); });
+
+  if (_editId) {
+    const idx=S.data[F.area].findIndex(r=>r.id==_editId);
+    if(idx>-1) S.data[F.area][idx]=obj;
+    showToast('Registro actualizado ✓');
+  } else {
+    S.data[F.area].push(obj);
+    showToast('Registro creado ✓');
+  }
+  refreshCounts(); closeModal(); go(F.area);
+}
+
+function gv(id){const e=document.getElementById(id);return e?e.value.trim():''}
+
+function delRow(area, id) {
+  if(!confirm('¿Eliminar este registro?')) return;
+  S.data[area]=S.data[area].filter(r=>r.id!=id);
+  refreshCounts(); go(area); showToast('Registro eliminado');
+}
+
+// ══════════════════════════════════════════════
+// FILE ATTACHMENTS
+// ══════════════════════════════════════════════
+function openFiles(area, id) {
+  const key=fKey(area,id);
+  if(!S.files[key]) S.files[key]=[];
+  const meta=AREA_META[area];
+  const rec=S.data[area].find(r=>r.id==id);
+  const recName=rec?(rec.nombre||rec.titulo||rec.institucion||`#${id}`):`#${id}`;
+
+  document.getElementById('modal-title').textContent=`📎 Archivos — ${recName}`;
+  document.getElementById('modal-foot').style.display='none';
+  document.getElementById('modal').classList.add('wide');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="drop-zone" id="dz">
+      <input type="file" id="fi" multiple onchange="handleFiles(event,'${area}',${id})">
+      <div class="drop-ico">☁️</div>
+      <div class="drop-txt"><strong>Hacé clic o arrastrá archivos aquí</strong><br>Cualquier tipo de archivo · Sin límite de cantidad<br><small style="color:var(--ink-muted);margin-top:4px;display:block">⚠️ Los archivos se guardan en memoria hasta conectar Google Drive</small></div>
+    </div>
+    <div class="flist" id="fl-${key}">${renderFiles(area,id)}</div>`;
+
+  setTimeout(()=>{
+    const dz=document.getElementById('dz');
+    if(!dz) return;
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over')});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+    dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');addFiles(e.dataTransfer.files,area,id)});
+  },60);
+
+  document.getElementById('overlay').classList.add('open');
+}
+
+function renderFiles(area,id){
+  const files=getFiles(area,id);
+  if(!files.length) return`<div class="no-files">Sin archivos adjuntos todavía.</div>`;
+  return files.map((f,i)=>`<div class="fitem">
+    <div class="fitem-ico">${fIcon(f.type)}</div>
+    <div class="fitem-info">
+      <div class="fitem-name" title="${f.name}">${f.name}</div>
+      <div class="fitem-meta">${fmtSize(f.size)} · ${f.by} · ${f.at}</div>
+    </div>
+    <div class="fitem-acts">
+      <button class="btn-sm" onclick="dlFile('${area}',${id},${i})">⬇ Descargar</button>
+      <button class="btn-sm del" onclick="rmFile('${area}',${id},${i})">✕</button>
+    </div>
+  </div>`).join('');
+}
+
+function handleFiles(e,area,id){addFiles(e.target.files,area,id)}
+
+function addFiles(fileList,area,id){
+  const key=fKey(area,id);
+  if(!S.files[key]) S.files[key]=[];
+  const now=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  let done=0;
+  Array.from(fileList).forEach(file=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      S.files[key].push({name:file.name,size:file.size,type:file.type,dataUrl:e.target.result,by:S.user.nombre,at:now});
+      done++;
+      if(done===fileList.length){
+        const fl=document.getElementById(`fl-${key}`);
+        if(fl) fl.innerHTML=renderFiles(area,id);
+        showToast(`${done} archivo${done!==1?'s':''} adjunto${done!==1?'s':''} ✓`);
+      }
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function dlFile(area,id,i){
+  const f=getFiles(area,id)[i]; if(!f) return;
+  const a=document.createElement('a'); a.href=f.dataUrl; a.download=f.name; a.click();
+}
+
+function rmFile(area,id,i){
+  if(!confirm('¿Eliminar este archivo?')) return;
+  S.files[fKey(area,id)].splice(i,1);
+  const fl=document.getElementById(`fl-${fKey(area,id)}`);
+  if(fl) fl.innerHTML=renderFiles(area,id);
+  showToast('Archivo eliminado');
+}
+
+// ══════════════════════════════════════════════
+// REPORTS — EXCEL & PDF
+// ══════════════════════════════════════════════
+function reportBtn(area){
+  return`<div class="report-menu" id="rm-${area}">
+    <button class="btn-report" onclick="toggleReport('${area}')">📊 Exportar ▾</button>
+    <div class="report-dd">
+      <button onclick="exportExcel('${area}')">📗 Descargar Excel</button>
+      <button onclick="exportPDF('${area}')">📕 Descargar PDF</button>
+    </div>
+  </div>`;
+}
+
+function toggleReport(area){
+  const m=document.getElementById('rm-'+area);
+  document.querySelectorAll('.report-menu.open').forEach(x=>{if(x!==m)x.classList.remove('open')});
+  m.classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.report-menu')) document.querySelectorAll('.report-menu.open').forEach(m=>m.classList.remove('open'));
 });
 
-// Enter key on login
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('auth-screen').style.display !== 'none') doLogin();
+const HEADERS = {
+  becas:     ['Nombre','DNI','Carrera','Tipo','Monto','Estado','Inicio','Responsable','Obs'],
+  rrhh_beca:     ['Nombre','DNI','Categoría','Dedicación','Estado','Resolución','Inicio','Obs'],
+  rrhh_contrato: ['Nombre','DNI','Cargo','Monto','Estado','Inicio','Fin','Obs'],
+  rrhh_codigo:   ['Nombre','DNI','Código','Categoría','Dedicación','Estado','Inicio','Obs'],
+  propiedad: ['Título','Tipo','Estado','Autores','Nro.Expediente','Fecha','Obs'],
+  proyectos: ['Nombre','Área','Director','Estado','Financiamiento','Inicio','Fin','Obs'],
+  pasantias: ['Nombre','DNI','Carrera','Empresa','Tutor','Estado','Inicio','Fin','Obs'],
+  convenios: ['Institución','Tipo','Estado','Firma','Vencimiento','Responsable','Obs'],
+};
+
+function getRows(area){
+  const keys=FORMS[Object.keys(FORMS).find(k=>FORMS[k].area===area)]?.keys||[];
+  return S.data[area].map(r=>keys.map(k=>r[k]||''));
+}
+
+function exportExcel(area){
+  const meta=AREA_META[area];
+  const wb=XLSX.utils.book_new();
+  const data=[HEADERS[area],...getRows(area)];
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  // style header row width
+  ws['!cols']=HEADERS[area].map(()=>({wch:20}));
+  XLSX.utils.book_append_sheet(wb,ws,meta.label);
+  XLSX.writeFile(wb,`${meta.label.replace(/\s/g,'_')}_${new Date().toISOString().slice(0,10)}.xlsx`);
+  showToast('Excel descargado ✓');
+}
+
+function exportPDF(area){
+  const meta=AREA_META[area];
+  const rows=getRows(area);
+  const hdrs=HEADERS[area];
+  const date=new Date().toLocaleDateString('es-AR');
+
+  // Build minimal PDF using plain text layout (no external lib needed)
+  const colW=Math.floor(190/hdrs.length);
+  let html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body{font-family:Arial,sans-serif;font-size:11px;margin:20px;color:#111}
+    h1{font-size:16px;margin-bottom:4px}p{color:#666;font-size:10px;margin-bottom:14px}
+    table{width:100%;border-collapse:collapse}
+    th{background:#1e4d35;color:#fff;padding:6px 8px;text-align:left;font-size:10px}
+    td{padding:5px 8px;border-bottom:1px solid #e0e0e0;font-size:10px}
+    tr:nth-child(even)td{background:#f8f8f8}
+    .footer{margin-top:16px;font-size:9px;color:#999;text-align:right}
+  </style></head><body>
+  <h1>${meta.icon} ${meta.label} — Reporte</h1>
+  <p>Generado el ${date} · Secretaría de Extensión Universitaria · ${rows.length} registro${rows.length!==1?'s':''}</p>
+  <table><thead><tr>${hdrs.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+  <tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c||'—'}</td>`).join('')}</tr>`).join('')}</tbody></table>
+  <div class="footer">Portal de Extensión Universitaria</div>
+  </body></html>`;
+
+  const w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>{ w.print(); }, 400);
+  showToast('PDF listo para imprimir ✓');
+}
+
+function filterByCol(sel,tid,col){
+  const v=(sel.value||'').toLowerCase();
+  document.querySelectorAll(`#${tid} tbody tr`).forEach(r=>{
+    const cell=r.cells[col];
+    const match=!v||(cell&&cell.textContent.toLowerCase().includes(v));
+    if(!match) r.classList.add('hidden-row'); else r.classList.remove('hidden-row');
+  });
+}
+
+// ══════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('modal').classList.remove('wide');
+  document.getElementById('modal-foot').style.display='';
+  if(S.page&&!['dashboard','usuarios'].includes(S.page)) go(S.page);
+}
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast show ${type}`;
+  setTimeout(()=>t.className='toast',3000);
+}
+
+// ══════════════════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('auth').style.display!=='none') doLogin();
+  if(e.key==='Escape') closeModal();
 });
 </script>
 </body>
