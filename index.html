@@ -342,18 +342,19 @@ let S = {
   user: null,
   page: 'dashboard',
   data: {
-    becas: [
-      {id:1, nombre:'Méndez, Juan',  dni:'38.211.400', carrera:'Ingeniería',   tipo:'Académica',    estado:'Activa',      inicio:'2025-03-01', monto:'$50.000', responsable:'Mariana', obs:''},
-      {id:2, nombre:'Torres, Ana',   dni:'41.005.210', carrera:'Biología',     tipo:'Investigación',estado:'En revisión', inicio:'2025-04-15', monto:'$80.000', responsable:'C. Romero', obs:''},
+    becas_economica: [
+      {id:1, apellido:'Méndez', nombre:'Juan', dni:'38.211.400', area:'CUFIT', unidad:'ING', monto:'$50.000', desde:'2025-03-01', hasta:'2025-12-31', instrumento:'Convenio', nroExp:'EXP-001', nroRes:'RES-001', obs:''},
     ],
+    becas_extension: [],
+    becas_vinculacion: [],
     rrhh_beca: [
-      {id:1, nombre:'Soto, María',  dni:'30.111.222', categoria:'JTP', dedicacion:'Simple', estado:'Activa', inicio:'2024-03-01', resolucion:'RES-2024-010', obs:''},
+      {id:1, area:'CUFIT', apellido:'Soto', nombre:'María', dni:'30.111.222', unidad:'ING', monto:'$80.000', desde:'2024-03-01', hasta:'2024-12-31', instrumento:'Resolución', nroExp:'EXP-2024-005', nroRes:'RES-2024-010', obs:''},
     ],
     rrhh_contrato: [
-      {id:1, nombre:'López, Pedro', dni:'28.333.444', cargo:'Asesor', monto:'$120.000', estado:'Vigente', inicio:'2025-01-01', fin:'2025-12-31', obs:''},
+      {id:1, area:'PEAM', apellido:'López', nombre:'Pedro', dni:'28.333.444', unidad:'ECO', monto:'$120.000', desde:'2025-01-01', hasta:'2025-12-31', instrumento:'Contrato', nroExp:'EXP-2025-001', nroRes:'RES-2025-003', obs:''},
     ],
     rrhh_codigo: [
-      {id:1, nombre:'Ramírez, Luis', dni:'35.555.666', codigo:'COD-001', categoria:'Titular', dedicacion:'Exclusiva', estado:'Activo', inicio:'2019-04-01', obs:''},
+      {id:1, area:'OTROS', apellido:'Ramírez', nombre:'Luis', dni:'35.555.666', unidad:'HUM', monto:'$95.000', desde:'2019-04-01', hasta:'2026-03-31', instrumento:'Ordenanza', nroExp:'EXP-2019-010', nroRes:'RES-2019-022', obs:''},
     ],
     propiedad: [
       {id:1, titulo:'Método de fermentación sostenible', tipo:'Patente',  autores:'Dr. Ramírez', estado:'En trámite', fecha:'2025-01-10', nroExp:'EXP-2025-001', obs:''},
@@ -439,9 +440,10 @@ function refreshCounts() {
   Object.keys(S.data).forEach(k=>{
     const el=document.getElementById('c-'+k); if(el) el.textContent=S.data[k].length;
   });
-  // RRHH total across 3 sub-areas
   const rrhhEl=document.getElementById('c-rrhh');
   if(rrhhEl) rrhhEl.textContent=(S.data.rrhh_beca||[]).length+(S.data.rrhh_contrato||[]).length+(S.data.rrhh_codigo||[]).length;
+  const becasEl=document.getElementById('c-becas');
+  if(becasEl) becasEl.textContent=(S.data.becas_economica||[]).length+(S.data.becas_extension||[]).length+(S.data.becas_vinculacion||[]).length;
 }
 
 // ══════════════════════════════════════════════
@@ -480,12 +482,14 @@ function filterRows(inp, tid) {
 function rDash(){
   const keys=Object.keys(AREA_META);
   const rrhhTotal=(S.data.rrhh_beca||[]).length+(S.data.rrhh_contrato||[]).length+(S.data.rrhh_codigo||[]).length;
-  const total=keys.filter(k=>!k.startsWith('rrhh_')).reduce((a,k)=>a+S.data[k].length,0)+rrhhTotal;
+  const becasTotal=(S.data.becas_economica||[]).length+(S.data.becas_extension||[]).length+(S.data.becas_vinculacion||[]).length;
+  const total=keys.filter(k=>!k.startsWith('rrhh_')&&!k.startsWith('becas_')).reduce((a,k)=>a+S.data[k].length,0)+rrhhTotal+becasTotal;
   return`<div class="ph"><div class="ph-left"><h2>Bienvenida, ${S.user.nombre.split(' ')[0]} 👋</h2><p>Panel de control — Secretaría de Extensión Universitaria</p></div></div>
   <div class="stats">
     <div class="scard"><div class="scard-lbl">Total registros</div><div class="scard-val">${total}</div><div class="scard-sub">en todas las áreas</div></div>
-    <div class="scard" style="cursor:pointer" onclick="go('rrhh')"><div class="scard-lbl">Recursos Humanos</div><div class="scard-val" style="color:var(--sapphire)">${rrhhTotal}</div><div class="scard-sub">Beca docente, contratos y código</div></div>
-    ${keys.filter(k=>!k.startsWith('rrhh_')).map(k=>`<div class="scard" style="cursor:pointer" onclick="go('${k}')"><div class="scard-lbl">${AREA_META[k].label}</div><div class="scard-val" style="color:${AREA_META[k].color}">${S.data[k].length}</div><div class="scard-sub">${AREA_META[k].desc}</div></div>`).join('')}
+    <div class="scard" style="cursor:pointer" onclick="go('becas')"><div class="scard-lbl">Becas Estudiantiles</div><div class="scard-val" style="color:var(--gold)">${becasTotal}</div><div class="scard-sub">Económicas, extensión, vinculación</div></div>
+    <div class="scard" style="cursor:pointer" onclick="go('rrhh')"><div class="scard-lbl">Recursos Humanos</div><div class="scard-val" style="color:var(--sapphire)">${rrhhTotal}</div><div class="scard-sub">Beca docente, contratos, código</div></div>
+    ${keys.filter(k=>!k.startsWith('rrhh_')&&!k.startsWith('becas_')).map(k=>`<div class="scard" style="cursor:pointer" onclick="go('${k}')"><div class="scard-lbl">${AREA_META[k].label}</div><div class="scard-val" style="color:${AREA_META[k].color}">${S.data[k].length}</div><div class="scard-sub">${AREA_META[k].desc}</div></div>`).join('')}
   </div>
   <div class="dash-grid">
     <div class="dcard"><h4>🗂 Áreas del sistema</h4>${keys.map(k=>`
@@ -504,35 +508,83 @@ function rDash(){
   </div>`;
 }
 
+
+// ─────────────────────────────────────────────
+// TABLA COMPARTIDA (BECAS + RRHH sub-áreas)
+// ─────────────────────────────────────────────
+function renderTabla(dataKey, formKey, tblId, e){
+  const data = S.data[dataKey]||[];
+  const btnLabel = {
+    becas_economica:'+ Nueva beca', becas_extension:'+ Nueva beca', becas_vinculacion:'+ Nueva beca',
+    rrhh_beca:'+ Nueva beca docente', rrhh_contrato:'+ Nuevo contrato', rrhh_codigo:'+ Nuevo registro',
+  }[dataKey]||'+ Nuevo';
+  return`<div class="toolbar">
+    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por apellido, nombre, DNI, área, unidad..." oninput="filterRows(this,'${tblId}')"></div>
+    <select class="fsel" onchange="filterByCol(this,'${tblId}',0)">
+      <option value="">Todas las áreas</option><option>CUFIT</option><option>PEAM</option><option>ARTE</option><option>OTROS</option>
+    </select>
+    <select class="fsel" onchange="filterByCol(this,'${tblId}',3)">
+      <option value="">Todas las UA</option><option>ING</option><option>AYV</option><option>HUM</option><option>EXA</option><option>ECO</option><option>REC</option>
+    </select>
+    ${e?`<button class="btn-new" onclick="openForm('${formKey}')">` + btnLabel + `</button>`:''}
+    ${reportBtn(dataKey)}
+  </div>
+  <div class="tbl-wrap"><table class="dtbl" id="${tblId}">
+    <thead><tr>
+      <th>Área</th><th>Apellido</th><th>Nombre</th><th>UA</th><th>DNI</th>
+      <th>Monto</th><th>Desde</th><th>Hasta</th>
+      <th>Instrumento</th><th>N° Exp.</th><th>N° Res.</th>
+      <th>Resolución</th>${e?'<th>Acciones</th>':''}
+    </tr></thead>
+    <tbody>${data.map(r=>`<tr data-id="${r.id}">
+      <td><span class="badge b-blue">${r.area||'—'}</span></td>
+      <td><strong>${r.apellido||'—'}</strong></td>
+      <td>${r.nombre||'—'}</td>
+      <td><span class="badge b-gray">${r.unidad||'—'}</span></td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${r.dni||'—'}</td>
+      <td>${r.monto||'—'}</td>
+      <td>${r.desde||'—'}</td>
+      <td>${r.hasta||'—'}</td>
+      <td>${r.instrumento||'—'}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${r.nroExp||'—'}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${r.nroRes||'—'}</td>
+      <td>${fbadge(dataKey,r.id)}</td>
+      ${e?`<td class="row-actions">
+        <button class="btn-sm" onclick="openForm('${formKey}',${r.id})">Editar</button>
+        <button class="btn-sm del" onclick="delRow('${dataKey}',${r.id})">✕</button>
+      </td>`:''}
+    </tr>`).join('')}</tbody>
+  </table>${data.length===0?nodata(dataKey):''}</div>`;
+}
 // ══════════════════════════════════════════════
-// BECAS ESTUDIANTILES
+// BECAS ESTUDIANTILES — 3 pestañas
 // ══════════════════════════════════════════════
 function rBecas(){
+  if(!S.becasTab) S.becasTab='economica';
   const e=canEdit();
+  const tabs=[
+    {key:'economica',   label:'💰 Económicas'},
+    {key:'extension',   label:'🌱 Extensión'},
+    {key:'vinculacion', label:'🔗 Vinculación'},
+  ];
+  const total=(S.data.becas_economica||[]).length+(S.data.becas_extension||[]).length+(S.data.becas_vinculacion||[]).length;
+  const tabBar=`<div style="display:flex;gap:4px;margin-bottom:22px;border-bottom:2px solid var(--line);padding-bottom:0">
+    ${tabs.map(t=>`<button onclick="setBecasTab('${t.key}')" style="padding:10px 20px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid ${S.becasTab===t.key?'var(--gold)':'transparent'};margin-bottom:-2px;color:${S.becasTab===t.key?'var(--gold)':'var(--ink-muted)'};transition:all .15s">${t.label}</button>`).join('')}
+  </div>`;
+  const dk='becas_'+S.becasTab;
   return`<div class="ph">
     <div class="ph-left"><h2>Becas Estudiantiles 🎓</h2><p>Gestión de becas estudiantiles de extensión universitaria</p></div>
-    <div class="ph-right">
-      ${e?`<button class="btn-new" onclick="openForm('beca')">+ Nueva beca</button>`:''}
-      ${reportBtn('becas')}
-    </div></div>
+  </div>
   <div class="stats">
-    <div class="scard"><div class="scard-lbl">Total</div><div class="scard-val" style="color:var(--gold)">${S.data.becas.length}</div></div>
-    <div class="scard"><div class="scard-lbl">Activas</div><div class="scard-val">${S.data.becas.filter(b=>b.estado==='Activa').length}</div></div>
-    <div class="scard"><div class="scard-lbl">En revisión</div><div class="scard-val">${S.data.becas.filter(b=>b.estado==='En revisión').length}</div></div>
+    <div class="scard"><div class="scard-lbl">Total</div><div class="scard-val" style="color:var(--gold)">${total}</div></div>
+    <div class="scard"><div class="scard-lbl">Económicas</div><div class="scard-val">${(S.data.becas_economica||[]).length}</div></div>
+    <div class="scard"><div class="scard-lbl">Extensión</div><div class="scard-val">${(S.data.becas_extension||[]).length}</div></div>
+    <div class="scard"><div class="scard-lbl">Vinculación</div><div class="scard-val">${(S.data.becas_vinculacion||[]).length}</div></div>
   </div>
-  <div class="toolbar">
-    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, DNI, carrera, tipo..." oninput="filterRows(this,'t-becas')"></div>
-    <select class="fsel" onchange="filterByCol(this,'t-becas',6)"><option value="">Todos los estados</option><option>Activa</option><option>En revisión</option><option>Finalizada</option></select>
-  </div>
-  <div class="tbl-wrap"><table class="dtbl" id="t-becas">
-    <thead><tr><th>Nombre</th><th>DNI</th><th>Carrera</th><th>Tipo</th><th>Monto</th><th>Inicio</th><th>Estado</th><th>Responsable</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
-    <tbody>${S.data.becas.map(r=>`<tr data-id="${r.id}">
-      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td><td>${r.carrera}</td><td>${r.tipo}</td><td>${r.monto}</td><td>${r.inicio}</td>
-      <td>${bStatus(r.estado)}</td><td>${r.responsable}</td><td>${fbadge('becas',r.id)}</td>
-      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('beca',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('becas',${r.id})">✕</button></td>`:''}
-    </tr>`).join('')}</tbody>
-  </table>${S.data.becas.length===0?nodata('becas'):''}</div>`;
+  ${tabBar}
+  ${renderTabla(dk, dk, 't-bec-'+S.becasTab, e)}`;
 }
+function setBecasTab(t){ S.becasTab=t; go('becas'); }
 
 // ══════════════════════════════════════════════
 // RECURSOS HUMANOS — 3 pestañas
@@ -545,17 +597,11 @@ function rRrhh(){
     {key:'contrato', label:'📋 Contratos'},
     {key:'codigo',   label:'🏛️ Código'},
   ];
+  const total=(S.data.rrhh_beca||[]).length+(S.data.rrhh_contrato||[]).length+(S.data.rrhh_codigo||[]).length;
   const tabBar=`<div style="display:flex;gap:4px;margin-bottom:22px;border-bottom:2px solid var(--line);padding-bottom:0">
     ${tabs.map(t=>`<button onclick="setRrhhTab('${t.key}')" style="padding:10px 20px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid ${S.rrhhTab===t.key?'var(--sapphire)':'transparent'};margin-bottom:-2px;color:${S.rrhhTab===t.key?'var(--sapphire)':'var(--ink-muted)'};transition:all .15s">${t.label}</button>`).join('')}
   </div>`;
-
-  const total=(S.data.rrhh_beca||[]).length+(S.data.rrhh_contrato||[]).length+(S.data.rrhh_codigo||[]).length;
-
-  let tabContent='';
-  if(S.rrhhTab==='beca')     tabContent=rRrhhBeca(e);
-  if(S.rrhhTab==='contrato') tabContent=rRrhhContrato(e);
-  if(S.rrhhTab==='codigo')   tabContent=rRrhhCodigo(e);
-
+  const dk='rrhh_'+S.rrhhTab;
   return`<div class="ph">
     <div class="ph-left"><h2>Recursos Humanos 👥</h2><p>Personal de la Secretaría de Extensión Universitaria</p></div>
   </div>
@@ -566,72 +612,12 @@ function rRrhh(){
     <div class="scard"><div class="scard-lbl">Código</div><div class="scard-val">${(S.data.rrhh_codigo||[]).length}</div></div>
   </div>
   ${tabBar}
-  ${tabContent}`;
+  ${renderTabla(dk, dk, 't-rrhh-'+S.rrhhTab, e)}`;
 }
-
-function setRrhhTab(tab){
-  S.rrhhTab=tab;
-  go('rrhh');
-}
-
-function rRrhhBeca(e){
-  const data=S.data.rrhh_beca||[];
-  return`<div class="toolbar">
-    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, DNI, categoría..." oninput="filterRows(this,'t-rb')"></div>
-    <select class="fsel" onchange="filterByCol(this,'t-rb',4)"><option value="">Todos los estados</option><option>Activa</option><option>Inactiva</option><option>Suspendida</option></select>
-    ${e?`<button class="btn-new" style="margin-left:auto" onclick="openForm('rrhh_beca')">+ Nueva beca docente</button>`:''}
-    ${reportBtn('rrhh_beca')}
-  </div>
-  <div class="tbl-wrap"><table class="dtbl" id="t-rb">
-    <thead><tr><th>Nombre</th><th>DNI</th><th>Categoría</th><th>Dedicación</th><th>Estado</th><th>Inicio</th><th>Resolución</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
-    <tbody>${data.map(r=>`<tr data-id="${r.id}">
-      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td><td>${r.categoria}</td><td>${r.dedicacion}</td>
-      <td>${bStatus(r.estado)}</td><td>${r.inicio}</td>
-      <td><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">${r.resolucion}</span></td>
-      <td>${fbadge('rrhh_beca',r.id)}</td>
-      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('rrhh_beca',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('rrhh_beca',${r.id})">✕</button></td>`:''}
-    </tr>`).join('')}</tbody>
-  </table>${data.length===0?nodata('Beca Docente'):''}</div>`;
-}
-
-function rRrhhContrato(e){
-  const data=S.data.rrhh_contrato||[];
-  return`<div class="toolbar">
-    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, DNI, cargo..." oninput="filterRows(this,'t-rc')"></div>
-    <select class="fsel" onchange="filterByCol(this,'t-rc',4)"><option value="">Todos los estados</option><option>Vigente</option><option>Vencido</option><option>Rescindido</option></select>
-    ${e?`<button class="btn-new" style="margin-left:auto" onclick="openForm('rrhh_contrato')">+ Nuevo contrato</button>`:''}
-    ${reportBtn('rrhh_contrato')}
-  </div>
-  <div class="tbl-wrap"><table class="dtbl" id="t-rc">
-    <thead><tr><th>Nombre</th><th>DNI</th><th>Cargo</th><th>Monto</th><th>Estado</th><th>Inicio</th><th>Fin</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
-    <tbody>${data.map(r=>`<tr data-id="${r.id}">
-      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td><td>${r.cargo}</td><td>${r.monto}</td>
-      <td>${bStatus(r.estado)}</td><td>${r.inicio}</td><td>${r.fin}</td>
-      <td>${fbadge('rrhh_contrato',r.id)}</td>
-      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('rrhh_contrato',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('rrhh_contrato',${r.id})">✕</button></td>`:''}
-    </tr>`).join('')}</tbody>
-  </table>${data.length===0?nodata('Contratos'):''}</div>`;
-}
-
-function rRrhhCodigo(e){
-  const data=S.data.rrhh_codigo||[];
-  return`<div class="toolbar">
-    <div class="search-wrap"><input class="search-inp" placeholder="Buscar por nombre, DNI, código..." oninput="filterRows(this,'t-rk')"></div>
-    <select class="fsel" onchange="filterByCol(this,'t-rk',4)"><option value="">Todos los estados</option><option>Activo</option><option>Inactivo</option><option>Licencia</option></select>
-    ${e?`<button class="btn-new" style="margin-left:auto" onclick="openForm('rrhh_codigo')">+ Nuevo registro</button>`:''}
-    ${reportBtn('rrhh_codigo')}
-  </div>
-  <div class="tbl-wrap"><table class="dtbl" id="t-rk">
-    <thead><tr><th>Nombre</th><th>DNI</th><th>Código</th><th>Categoría</th><th>Estado</th><th>Dedicación</th><th>Inicio</th><th>Archivos</th>${e?'<th>Acciones</th>':''}</tr></thead>
-    <tbody>${data.map(r=>`<tr data-id="${r.id}">
-      <td><strong>${r.nombre}</strong></td><td>${r.dni}</td>
-      <td><span style="font-family:'IBM Plex Mono',monospace;font-size:12px">${r.codigo}</span></td>
-      <td>${r.categoria}</td><td>${bStatus(r.estado)}</td><td>${r.dedicacion}</td><td>${r.inicio}</td>
-      <td>${fbadge('rrhh_codigo',r.id)}</td>
-      ${e?`<td class="row-actions"><button class="btn-sm" onclick="openForm('rrhh_codigo',${r.id})">Editar</button><button class="btn-sm del" onclick="delRow('rrhh_codigo',${r.id})">✕</button></td>`:''}
-    </tr>`).join('')}</tbody>
-  </table>${data.length===0?nodata('Código'):''}</div>`;
-}
+function setRrhhTab(t){ S.rrhhTab=t; go('rrhh'); }
+function rRrhhBeca(){}
+function rRrhhContrato(){}
+function rRrhhCodigo(){}
 
 // ══════════════════════════════════════════════
 // PROPIEDAD INTELECTUAL
@@ -778,86 +764,139 @@ function rUsuarios(){
 // FORMS CONFIG
 // ══════════════════════════════════════════════
 const FORMS = {
-  beca:{
-    title:'🎓 Beca Estudiantil', area:'becas',
-    fields:`<div class="frow">
-      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="González, Juan"></div>
-      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+  becas_economica:  {title:'💰 Beca Económica',   area:'becas_economica',  fields:`    <div class="frow">
+      <div class="fgroup"><label>Área</label><select id="f0"><option value="">Seleccionar...</option><option>CUFIT</option><option>PEAM</option><option>ARTE</option><option>OTROS</option></select></div>
+      <div class="fgroup"><label>Unidad Académica</label><select id="f1"><option value="">Seleccionar...</option><option>ING</option><option>AYV</option><option>HUM</option><option>EXA</option><option>ECO</option><option>REC</option></select></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Carrera</label><input id="f2" type="text" placeholder="Nombre de la carrera"></div>
-      <div class="fgroup"><label>Tipo de beca</label><select id="f3"><option>Académica</option><option>Investigación</option><option>Extensión</option><option>Deportiva</option><option>Socioeconómica</option></select></div>
+      <div class="fgroup"><label>Apellido</label><input id="f2" type="text" placeholder="Apellido"></div>
+      <div class="fgroup"><label>Nombre</label><input id="f3" type="text" placeholder="Nombre"></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Monto mensual</label><input id="f4" type="text" placeholder="$0.000"></div>
-      <div class="fgroup"><label>Estado</label><select id="f5"><option>Activa</option><option>En revisión</option><option>Finalizada</option></select></div>
+      <div class="fgroup"><label>DNI</label><input id="f4" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Monto</label><input id="f5" type="text" placeholder="$0.000"></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Fecha inicio</label><input id="f6" type="date"></div>
-      <div class="fgroup"><label>Responsable</label><input id="f7" type="text" placeholder="Nombre del responsable"></div>
-    </div>
-    <div class="fgroup"><label>Observaciones</label><textarea id="f8" placeholder="Notas adicionales..."></textarea></div>`,
-    keys:['nombre','dni','carrera','tipo','monto','estado','inicio','responsable','obs'],
-    required:[0],
-  },
-  rrhh_beca:{
-    title:'🎓 Beca Docente', area:'rrhh_beca',
-    fields:`<div class="frow">
-      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="Apellido, Nombre"></div>
-      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Desde</label><input id="f6" type="date"></div>
+      <div class="fgroup"><label>Hasta</label><input id="f7" type="date"></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Categoría docente</label><input id="f2" type="text" placeholder="Prof. Titular, JTP, Ayudante..."></div>
-      <div class="fgroup"><label>Dedicación</label><select id="f3"><option>Simple</option><option>Semiexclusiva</option><option>Exclusiva</option></select></div>
+      <div class="fgroup"><label>Instrumento de vinculación</label><input id="f8" type="text" placeholder="Convenio, Resolución, Contrato..."></div>
+      <div class="fgroup"><label>N° Expediente</label><input id="f9" type="text" placeholder="EXP-YYYY-000"></div>
+    </div>
+    <div class="fgroup"><label>N° Resolución</label><input id="f10" type="text" placeholder="RES-YYYY-000"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f11" placeholder="Notas adicionales..."></textarea></div>`, keys:['area','unidad','apellido','nombre','dni','monto','desde','hasta','instrumento','nroExp','nroRes','obs'], required:[2]},
+  becas_extension:  {title:'🌱 Beca Extensión',   area:'becas_extension',  fields:`    <div class="frow">
+      <div class="fgroup"><label>Área</label><select id="f0"><option value="">Seleccionar...</option><option>CUFIT</option><option>PEAM</option><option>ARTE</option><option>OTROS</option></select></div>
+      <div class="fgroup"><label>Unidad Académica</label><select id="f1"><option value="">Seleccionar...</option><option>ING</option><option>AYV</option><option>HUM</option><option>EXA</option><option>ECO</option><option>REC</option></select></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Estado</label><select id="f4"><option>Activa</option><option>Inactiva</option><option>Suspendida</option></select></div>
-      <div class="fgroup"><label>Resolución</label><input id="f5" type="text" placeholder="RES-YYYY-000"></div>
-    </div>
-    <div class="fgroup"><label>Fecha inicio</label><input id="f6" type="date"></div>
-    <div class="fgroup"><label>Observaciones</label><textarea id="f7" placeholder="Notas..."></textarea></div>`,
-    keys:['nombre','dni','categoria','dedicacion','estado','resolucion','inicio','obs'],
-    required:[0],
-  },
-  rrhh_contrato:{
-    title:'📋 Contrato', area:'rrhh_contrato',
-    fields:`<div class="frow">
-      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="Apellido, Nombre"></div>
-      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Apellido</label><input id="f2" type="text" placeholder="Apellido"></div>
+      <div class="fgroup"><label>Nombre</label><input id="f3" type="text" placeholder="Nombre"></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Cargo / Función</label><input id="f2" type="text" placeholder="Asesor, Técnico, Administrativo..."></div>
-      <div class="fgroup"><label>Monto mensual</label><input id="f3" type="text" placeholder="$0.000"></div>
+      <div class="fgroup"><label>DNI</label><input id="f4" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Monto</label><input id="f5" type="text" placeholder="$0.000"></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Estado</label><select id="f4"><option>Vigente</option><option>Vencido</option><option>Rescindido</option></select></div>
-      <div class="fgroup"><label>Fecha inicio</label><input id="f5" type="date"></div>
-    </div>
-    <div class="fgroup"><label>Fecha fin</label><input id="f6" type="date"></div>
-    <div class="fgroup"><label>Observaciones</label><textarea id="f7" placeholder="Notas..."></textarea></div>`,
-    keys:['nombre','dni','cargo','monto','estado','inicio','fin','obs'],
-    required:[0],
-  },
-  rrhh_codigo:{
-    title:'🏛️ Cargo por Código', area:'rrhh_codigo',
-    fields:`<div class="frow">
-      <div class="fgroup"><label>Nombre (Apellido, Nombre)</label><input id="f0" type="text" placeholder="Apellido, Nombre"></div>
-      <div class="fgroup"><label>DNI</label><input id="f1" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Desde</label><input id="f6" type="date"></div>
+      <div class="fgroup"><label>Hasta</label><input id="f7" type="date"></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Código de cargo</label><input id="f2" type="text" placeholder="COD-000"></div>
-      <div class="fgroup"><label>Categoría</label><input id="f3" type="text" placeholder="Titular, Asociado, Adjunto..."></div>
+      <div class="fgroup"><label>Instrumento de vinculación</label><input id="f8" type="text" placeholder="Convenio, Resolución, Contrato..."></div>
+      <div class="fgroup"><label>N° Expediente</label><input id="f9" type="text" placeholder="EXP-YYYY-000"></div>
+    </div>
+    <div class="fgroup"><label>N° Resolución</label><input id="f10" type="text" placeholder="RES-YYYY-000"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f11" placeholder="Notas adicionales..."></textarea></div>`, keys:['area','unidad','apellido','nombre','dni','monto','desde','hasta','instrumento','nroExp','nroRes','obs'], required:[2]},
+  becas_vinculacion:{title:'🔗 Beca Vinculación', area:'becas_vinculacion', fields:`    <div class="frow">
+      <div class="fgroup"><label>Área</label><select id="f0"><option value="">Seleccionar...</option><option>CUFIT</option><option>PEAM</option><option>ARTE</option><option>OTROS</option></select></div>
+      <div class="fgroup"><label>Unidad Académica</label><select id="f1"><option value="">Seleccionar...</option><option>ING</option><option>AYV</option><option>HUM</option><option>EXA</option><option>ECO</option><option>REC</option></select></div>
     </div>
     <div class="frow">
-      <div class="fgroup"><label>Dedicación</label><select id="f4"><option>Simple</option><option>Semiexclusiva</option><option>Exclusiva</option></select></div>
-      <div class="fgroup"><label>Estado</label><select id="f5"><option>Activo</option><option>Inactivo</option><option>Licencia</option></select></div>
+      <div class="fgroup"><label>Apellido</label><input id="f2" type="text" placeholder="Apellido"></div>
+      <div class="fgroup"><label>Nombre</label><input id="f3" type="text" placeholder="Nombre"></div>
     </div>
-    <div class="fgroup"><label>Fecha ingreso</label><input id="f6" type="date"></div>
-    <div class="fgroup"><label>Observaciones</label><textarea id="f7" placeholder="Notas..."></textarea></div>`,
-    keys:['nombre','dni','codigo','categoria','dedicacion','estado','inicio','obs'],
-    required:[0],
-  },
-  propiedad:{
+    <div class="frow">
+      <div class="fgroup"><label>DNI</label><input id="f4" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Monto</label><input id="f5" type="text" placeholder="$0.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Desde</label><input id="f6" type="date"></div>
+      <div class="fgroup"><label>Hasta</label><input id="f7" type="date"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Instrumento de vinculación</label><input id="f8" type="text" placeholder="Convenio, Resolución, Contrato..."></div>
+      <div class="fgroup"><label>N° Expediente</label><input id="f9" type="text" placeholder="EXP-YYYY-000"></div>
+    </div>
+    <div class="fgroup"><label>N° Resolución</label><input id="f10" type="text" placeholder="RES-YYYY-000"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f11" placeholder="Notas adicionales..."></textarea></div>`, keys:['area','unidad','apellido','nombre','dni','monto','desde','hasta','instrumento','nroExp','nroRes','obs'], required:[2]},
+  rrhh_beca:        {title:'🎓 Beca Docente',      area:'rrhh_beca',        fields:`    <div class="frow">
+      <div class="fgroup"><label>Área</label><select id="f0"><option value="">Seleccionar...</option><option>CUFIT</option><option>PEAM</option><option>ARTE</option><option>OTROS</option></select></div>
+      <div class="fgroup"><label>Unidad Académica</label><select id="f1"><option value="">Seleccionar...</option><option>ING</option><option>AYV</option><option>HUM</option><option>EXA</option><option>ECO</option><option>REC</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Apellido</label><input id="f2" type="text" placeholder="Apellido"></div>
+      <div class="fgroup"><label>Nombre</label><input id="f3" type="text" placeholder="Nombre"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>DNI</label><input id="f4" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Monto</label><input id="f5" type="text" placeholder="$0.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Desde</label><input id="f6" type="date"></div>
+      <div class="fgroup"><label>Hasta</label><input id="f7" type="date"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Instrumento de vinculación</label><input id="f8" type="text" placeholder="Convenio, Resolución, Contrato..."></div>
+      <div class="fgroup"><label>N° Expediente</label><input id="f9" type="text" placeholder="EXP-YYYY-000"></div>
+    </div>
+    <div class="fgroup"><label>N° Resolución</label><input id="f10" type="text" placeholder="RES-YYYY-000"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f11" placeholder="Notas adicionales..."></textarea></div>`, keys:['area','unidad','apellido','nombre','dni','monto','desde','hasta','instrumento','nroExp','nroRes','obs'], required:[2]},
+  rrhh_contrato:    {title:'📋 Contrato',          area:'rrhh_contrato',    fields:`    <div class="frow">
+      <div class="fgroup"><label>Área</label><select id="f0"><option value="">Seleccionar...</option><option>CUFIT</option><option>PEAM</option><option>ARTE</option><option>OTROS</option></select></div>
+      <div class="fgroup"><label>Unidad Académica</label><select id="f1"><option value="">Seleccionar...</option><option>ING</option><option>AYV</option><option>HUM</option><option>EXA</option><option>ECO</option><option>REC</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Apellido</label><input id="f2" type="text" placeholder="Apellido"></div>
+      <div class="fgroup"><label>Nombre</label><input id="f3" type="text" placeholder="Nombre"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>DNI</label><input id="f4" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Monto</label><input id="f5" type="text" placeholder="$0.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Desde</label><input id="f6" type="date"></div>
+      <div class="fgroup"><label>Hasta</label><input id="f7" type="date"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Instrumento de vinculación</label><input id="f8" type="text" placeholder="Convenio, Resolución, Contrato..."></div>
+      <div class="fgroup"><label>N° Expediente</label><input id="f9" type="text" placeholder="EXP-YYYY-000"></div>
+    </div>
+    <div class="fgroup"><label>N° Resolución</label><input id="f10" type="text" placeholder="RES-YYYY-000"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f11" placeholder="Notas adicionales..."></textarea></div>`, keys:['area','unidad','apellido','nombre','dni','monto','desde','hasta','instrumento','nroExp','nroRes','obs'], required:[2]},
+  rrhh_codigo:      {title:'🏛️ Código',           area:'rrhh_codigo',      fields:`    <div class="frow">
+      <div class="fgroup"><label>Área</label><select id="f0"><option value="">Seleccionar...</option><option>CUFIT</option><option>PEAM</option><option>ARTE</option><option>OTROS</option></select></div>
+      <div class="fgroup"><label>Unidad Académica</label><select id="f1"><option value="">Seleccionar...</option><option>ING</option><option>AYV</option><option>HUM</option><option>EXA</option><option>ECO</option><option>REC</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Apellido</label><input id="f2" type="text" placeholder="Apellido"></div>
+      <div class="fgroup"><label>Nombre</label><input id="f3" type="text" placeholder="Nombre"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>DNI</label><input id="f4" type="text" placeholder="00.000.000"></div>
+      <div class="fgroup"><label>Monto</label><input id="f5" type="text" placeholder="$0.000"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Desde</label><input id="f6" type="date"></div>
+      <div class="fgroup"><label>Hasta</label><input id="f7" type="date"></div>
+    </div>
+    <div class="frow">
+      <div class="fgroup"><label>Instrumento de vinculación</label><input id="f8" type="text" placeholder="Convenio, Resolución, Contrato..."></div>
+      <div class="fgroup"><label>N° Expediente</label><input id="f9" type="text" placeholder="EXP-YYYY-000"></div>
+    </div>
+    <div class="fgroup"><label>N° Resolución</label><input id="f10" type="text" placeholder="RES-YYYY-000"></div>
+    <div class="fgroup"><label>Observaciones</label><textarea id="f11" placeholder="Notas adicionales..."></textarea></div>`, keys:['area','unidad','apellido','nombre','dni','monto','desde','hasta','instrumento','nroExp','nroRes','obs'], required:[2]},
+    propiedad:{
     title:'💡 Propiedad Intelectual', area:'propiedad',
     fields:`<div class="fgroup"><label>Título de la creación</label><input id="f0" type="text" placeholder="Nombre completo de la obra/invención"></div>
     <div class="frow">
@@ -1105,10 +1144,12 @@ document.addEventListener('click',e=>{
 });
 
 const HEADERS = {
-  becas:     ['Nombre','DNI','Carrera','Tipo','Monto','Estado','Inicio','Responsable','Obs'],
-  rrhh_beca:     ['Nombre','DNI','Categoría','Dedicación','Estado','Resolución','Inicio','Obs'],
-  rrhh_contrato: ['Nombre','DNI','Cargo','Monto','Estado','Inicio','Fin','Obs'],
-  rrhh_codigo:   ['Nombre','DNI','Código','Categoría','Dedicación','Estado','Inicio','Obs'],
+  becas_economica:  ['Área','UA','Apellido','Nombre','DNI','Monto','Desde','Hasta','Instrumento','N°Exp','N°Res','Obs'],
+  becas_extension:  ['Área','UA','Apellido','Nombre','DNI','Monto','Desde','Hasta','Instrumento','N°Exp','N°Res','Obs'],
+  becas_vinculacion:['Área','UA','Apellido','Nombre','DNI','Monto','Desde','Hasta','Instrumento','N°Exp','N°Res','Obs'],
+  rrhh_beca:     ['Área','UA','Apellido','Nombre','DNI','Monto','Desde','Hasta','Instrumento','N°Exp','N°Res','Obs'],
+  rrhh_contrato: ['Área','UA','Apellido','Nombre','DNI','Monto','Desde','Hasta','Instrumento','N°Exp','N°Res','Obs'],
+  rrhh_codigo:   ['Área','UA','Apellido','Nombre','DNI','Monto','Desde','Hasta','Instrumento','N°Exp','N°Res','Obs'],
   propiedad: ['Título','Tipo','Estado','Autores','Nro.Expediente','Fecha','Obs'],
   proyectos: ['Nombre','Área','Director','Estado','Financiamiento','Inicio','Fin','Obs'],
   pasantias: ['Nombre','DNI','Carrera','Empresa','Tutor','Estado','Inicio','Fin','Obs'],
